@@ -1,0 +1,207 @@
+---
+title: '05'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(readxl)
+```
+```{r}
+sales = read_xlsx("C:/Users/이찬솔/Desktop/숭실/R/실무 예제/Cafe_Sales.xlsx", sheet = 1)
+head(sales)
+```
+```{r}
+dim(sales)
+```
+```{r}
+sum(is.na(sales))
+sales <- na.omit(sales) ; sum(is.na(sales))
+```
+#### 카페에서 가장 많이 판매한 메뉴 확인하기
+```{r message=FALSE, warning=FALSE}
+sort(table(sales$item), decreasing = T)
+```
+```{r warning=FALSE}
+sales_tr <- data.frame(table(sales$item))
+head(sales_tr)
+```
+```{r warning=FALSE}
+sales_item <- data.frame(sales$item, sales$price)
+sales_item <- unique(sales_item)
+colnames(sales_item) <- c("item", "price")
+head(sales_item)
+```
+```{r warning=FALSE}
+item_list = merge(sales_tr, sales_item,
+                  by.x = "Var1", by.y = "item")
+head(item_list)
+```
+```{r warning=FALSE}
+item_list$amount = item_list$Freq * item_list$price
+head(item_list)
+```
+
+#### 요일별로 판매한 메뉴 확인
+```{r warning=FALSE}
+sales$weekday <- weekdays(sales$order_date)
+head(sales)
+```
+```{r}
+table(sales$weekday)
+```
+```{r}
+(date_info = data.frame(weekday = c("월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"),
+                       day = c("평일", "평일", "평일", "평일", "평일", "주말", "주말")))
+```
+```{r}
+sales = merge(sales, date_info)
+head(sales)
+```
+```{r}
+table(sales$day)
+```
+#### 계절별로 판매한 메뉴 확인하기
+```{r warning=FALSE}
+sales$month <- months(sales$order_date)
+
+for(i in 1:nrow(sales)){
+  if(sales$month[i] == "1월"){
+    sales$season[i] = "겨울"
+  }else if(sales$month[i] == "2월"){
+    sales$season[i] = "겨울"
+  }else if(sales$month[i] == "3월"){
+    sales$season[i] = "봄"
+  }else if(sales$month[i] == "4월"){
+    sales$season[i] = "봄"
+  }else if(sales$month[i] == "5월"){
+    sales$season[i] = "봄"
+  }else if(sales$month[i] == "6월"){ 
+    sales$season[i] = "여름"
+  }else if(sales$month[i] == "7월"){ 
+    sales$season[i] = "여름"
+  }else if(sales$month[i] == "8월"){ 
+    sales$season[i] = "여름"
+  }else if(sales$month[i] == "9월"){ 
+    sales$season[i] = "가을"
+  }else if(sales$month[i] == "10월"){ 
+    sales$season[i] = "가을"
+  }else if(sales$month[i] == "11월"){ 
+    sales$season[i] = "가을"
+  }else
+    sales$season[i] = "겨울"
+}
+
+for(i in 1:nrow(sales)){
+  if(sales$month[i]=="12월"|sales$month[i]=="1월"|sales$month[i]=="2월"){
+    sales$season[i] = "겨울"
+  }else if(sales$month[i]=="3월"|sales$month[i]=="4월"|sales$month[i]=="5월"){
+    sales$season[i] = "봄"
+  }else if(sales$month[i]=="6월"|sales$month[i]=="7월"|sales$month[i]=="8월"){
+    sales$season[i] = "여름"
+  }else
+    sales$season[i] = "가을"
+}
+```
+```{r}
+head(sales)
+```
+```{r}
+table(sales$season)
+```
+
+- 매출 현황 그래프로 분석하기
+- 카테고리별 판매 건수 시각화하기
+```{r message=FALSE, warning=FALSE}
+sales = read_xlsx("C:/Users/이찬솔/Desktop/숭실/R/실무 예제/Cafe_Sales.xlsx", sheet = 1)
+target = data.frame(table(sales$category))
+head(target) 
+```
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+```
+```{r message=FALSE, warning=FALSE}
+ggplot(target, aes(x = Var1, y = Freq)) +
+       geom_col() + #### 막대그래프
+       geom_text(label = paste0(target$Freq, "건"), #### 막대그래프위 텍스트
+                 nudge_y = 2000) #### 막대그래프, 텍스트 간격
+```
+- 월별 판매 건수 시각화하기
+```{r message=FALSE, warning=FALSE}
+sales$date_ym = format(sales$order_date, "%Y-%m")
+head(sales)
+```
+```{r message=FALSE, warning=FALSE}
+target = data.frame(table(sales$date_ym))
+head(target)
+```
+```{r message=FALSE, warning=FALSE}
+(target_12 = tail(target, 12))
+```
+```{r message=FALSE, warning=FALSE}
+ggplot(target_12, aes(x = Var1, y = Freq, group = 1)) +
+       geom_line(size = 1,
+                 color = "#000000",
+                 linetype = 2)
+```
+```{r}
+ggplot(tail(target, 12), aes(x = Var1, y = Freq, group = 1)) +
+       geom_line(size = 1,
+                 color = "#000000") +
+       geom_point(color = "#173F5F") +
+       geom_text(aes(label = Freq), nudge_y = 100)
+```
+- 요일별 판매 건수 시각화하기
+```{r message=FALSE, warning=FALSE}
+sales$weekday = weekdays(sales$order_date)
+(target = data.frame(table(sales$weekday)))
+```
+```{r message=FALSE, warning=FALSE}
+target$por = target$Freq/sum(target$Freq)*100
+```
+```{r message=FALSE, warning=FALSE}
+ggplot(target, aes(x ="", y = por, fill = Var1)) +
+       geom_col()
+```
+```{r message=FALSE, warning=FALSE}
+ggplot(target, aes(x ="", y = por, fill = Var1)) +
+       geom_col() +
+       coord_polar(theta = "y")
+```
+```{r message=FALSE, warning=FALSE}
+ggplot(target, aes(x ="", y = por, fill = Var1)) +
+       geom_col() +
+       coord_polar(theta = "y") +
+       geom_text(aes(label = paste0(Var1, "\n", round(por, 2), "%")),
+                 position = position_stack(vjust = 0.5))
+```
+```{r message=FALSE, warning=FALSE}
+ggplot(target, aes(x ="", y = por, fill = Var1)) +
+       geom_col() +
+       coord_polar(theta = "y") +
+       geom_text(col = "white",
+                 aes(label = paste0(Var1, "\n", round(por, 2), "%")),
+                 position = position_stack(vjust = 0.5)) +
+       scale_fill_manual(values = c("#000000", "#222222",
+                                    "#444444", "#666666",
+                                    "#888888", "#999999"))
+```
+```{r message=FALSE, warning=FALSE}
+ggplot(target, aes(x ="", y = por, fill = Var1)) +
+       geom_col() +
+       coord_polar(theta = "y") +
+       geom_text(col = "white",
+                 aes(label = paste0(Var1, "\n", round(por, 2), "%")),
+                 position = position_stack(vjust = 0.5)) +
+       scale_fill_manual(values = c("#000000", "#222222",
+                                    "#444444", "#666666",
+                                    "#888888", "#999999")) +
+       theme(legend.position = "none",
+             panel.background = element_blank(),
+             axis.text = element_blank(),
+             axis.title = element_blank(),
+             axis.ticks = element_blank())
+```

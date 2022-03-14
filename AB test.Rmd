@@ -1,0 +1,337 @@
+---
+title: "06. 광고, 정말 효과가 있을까_"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r message=FALSE, warning=FALSE}
+library(readxl)
+```
+```{r}
+adver = read_xlsx("C:/Users/이찬솔/Desktop/숭실/R/실무 예제/abtest.xlsx", sheet = 1)
+dim(adver)
+```
+```{r}
+head(adver)
+```
+- 결측값 제거
+```{r}
+adver <- adver[adver$sales != "NA",]
+adver$sales = as.numeric(adver$sales)
+```
+```{r}
+summary(adver)
+```
+```{r}
+head(unique(adver$city1))
+```
+```{r}
+head(unique(adver$city2))
+```
+
+
+#### 통계적 검정
+#### 가설검정
+##### A/B test : 독립표본 T-검정
+##### 귀무가설 : 두 광고를 열어본 횟수의 평균에는 차이가 없다
+
+- 1. 정규성 검정
+- 2. 등분산 검정
+- 3. 독립표본 T-검정 
+(A/B test : 독립표본 T-검정, 귀무가설 : 두 광고를 열어본 횟수의 평균에는 차이가 없다 )
+
+- 광고 성과 측정 지표 : 광고 메일을 연 횟수, 광고를 클릭한 횟수, 구매전환 수
+
+
+- A_GROUP / B_GROUP 추출하기
+```{r}
+adver <- as.data.frame(adver)
+A_GROUP <- adver[adver$type == "A_GROUP",]
+B_GROUP <- adver[adver$type == "B_GROUP",]
+```
+
+
+#### 정규성 검정
+- 5000건 이하의 샘플 : shapiro.test() / Shapiro-Wilk
+- 5000건 이상 : ad.test() / Anderson-Darling
+```{r message=FALSE, warning=FALSE}
+library(nortest)
+```
+```{r}
+ad.test(A_GROUP$open)
+```
+```{r}
+ad.test(B_GROUP$open)
+```
+```{r}
+ad.test(A_GROUP$click)
+```
+```{r}
+ad.test(B_GROUP$click)
+```
+```{r}
+ad.test(A_GROUP$conversion)
+```
+```{r}
+ad.test(B_GROUP$conversion)
+```
+- A_GROUP과 B_GROUP의 광고 이메일 / 광고 클릭 / 구매 전환 모두 정규성 불만족
+
+
+- 정규성 만족 => var.test() (귀무가설 : 집단 간의 등분산)
+- 정규성 불만족 => Levene() (귀무가설 : 집단 간의 등분산)
+```{r message=FALSE, warning=FALSE}
+library(car)
+```
+```{r}
+leveneTest(y = adver$open, group = factor(adver$type))
+```
+- A_GROUP과 B_GROUP의 광고 이메일 확인 횟수는 등분산
+
+
+```{r}
+leveneTest(y = adver$click, group = factor(adver$type))
+```
+- A_GROUP과 B_GROUP의 광고 광고 클릭 횟수는 등분산X
+
+
+```{r}
+leveneTest(y = adver$conversion, group = factor(adver$type))
+```
+- A_GROUP과 B_GROUP의 광고 구매 전환 횟수는 등분산X
+
+
+#### T-Test 독립표본 T-검정 (귀무가설 : 집단의 평균은 차이가 없다)
+```{r}
+t.test(A_GROUP$open, B_GROUP$open)
+```
+- A_GROUP과 B_GROUP의 광고 이메일 확인 횟수는 평균적으로 차이가 없다
+
+```{r message=FALSE, warning=FALSE}
+library(car)
+library(ggplot2)
+```
+```{r}
+# A_GROUP과 B_GROUP별 광고 이메일을 열어본 횟수
+ggplot(adver, aes(x = type, y = open)) +
+  geom_boxplot() +
+  labs(title = "이메일 연 수") +
+  theme(title = element_text(size = 15, face = "bold"),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_blank())
+```
+
+
+```{r}
+t.test(A_GROUP$click, B_GROUP$click)
+```
+- A_GROUP과 B_GROUP의 광고 광고 클릭 횟수는 평균적으로 차이가 있다
+
+
+```{r}
+# A_GROUP과 B_GROUP별 광고를 클릭해본 횟수
+ggplot(adver, aes(x = type, y = click)) +
+  geom_boxplot() +
+  labs(title = "광고 클릭 수") +
+  theme(title = element_text(size = 15, face = "bold"),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_blank())
+```
+- A_GROUP보다 B_GROUP의 광고 클릭 횟수가 더 많음 => B_GROUP이 긍정적 결과
+
+
+```{r}
+t.test(A_GROUP$conversion, B_GROUP$conversion)
+```
+- A_GROUP과 B_GROUP의 광고 구매 전환 횟수는 평균적으로 차이가 있다
+
+```{r}
+# A_GROUP과 B_GROUP별 구매 전환 횟수
+ggplot(adver, aes(x = type, y = conversion)) +
+  geom_boxplot() +
+  labs(title = "구매 전환 수") +
+  theme(title = element_text(size = 15, face = "bold"),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_blank())
+```
+- A_GROUP보다 B_GROUP의 구매 전환 횟수가 더 많음 => B_GROUP이 긍정적 결과
+
+
+#### 경기도 추출하기
+##### 경기도의 A_GROUP / B_GROUP 추출하기
+```{r}
+kyungki <- adver[adver$city1 == "경기도",]
+kyungki_A <- kyungki[kyungki$type == "A_GROUP",]
+kyungki_B <- kyungki[kyungki$type == "B_GROUP",]
+dim(kyungki_A) ; dim(kyungki_B)
+```
+##### 정규성 검정
+```{r}
+shapiro.test(kyungki_A$open)
+```
+- 경기도의 A_GROUP의 이메일 확인의 분포는 정규성X
+
+
+```{r}
+shapiro.test(kyungki_B$open)
+```
+- 경기도의 B_GROUP의 이메일 확인의 분포는 정규성X
+
+
+- 경기도의 A_GROUP, B_GROUP둘다 정규성X => wilcox.test() (귀무가설 : 두 집단 평균의 차이는 없다)
+
+```{r}
+leveneTest(y = kyungki$open, group = factor(kyungki$type))
+```
+- 경기도의 A_GROUP과 B_GROUP간 등분산성
+
+```{r}
+wilcox.test(open ~ type, kyungki)
+```
+- 경기도의 A_GROUP, B_GROUP간 평균의 차이 없다.
+
+#### 결론
+- 이메일 확인은 지역별로 A_GROUP과 B_GROUP간 통계적 차이가 없다.
+- 광고 열람과 구매전환은 지역별로 A_GROUP과 B_GROUP간 통계적 차이가 있다 => B_GROUP이 더 긍정적 효과
+
+
+#### raster 패키지를 이용하여 대한민국 지도 그리기
+getData(name, country, level)
+- name : "GADM" (https://gadm.org/index.html)
+- level : (0 : 국가 / 1 : 시도 / 2 : 시군구)
+
+```{r message=FALSE, warning=FALSE}
+library(raster)
+```
+
+- 국가
+```{r message=FALSE, warning=FALSE}
+korea = getData(name = "GADM",
+                country = "kor",
+                level = 0)
+p1 <- ggplot(korea) 
+p1 +  geom_polygon(aes(x = long, y = lat, group = group),
+                   fill = "white", color = "black") + 
+  labs(title = "Korea") +
+  theme(axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank())
+```
+korea$GID_0 : 세자리 영문 코드
+korea$NAME_0 : 전체 영문 이름
+
+
+- 시/도
+```{r message=FALSE, warning=FALSE}
+korea_sido = getData(name = "GADM",
+                     country = "kor",
+                     level = 1)
+p2 <- ggplot(korea_sido) 
+p2 + labs(title = "Sido") +
+  geom_polygon(aes(x = long, y = lat, group = group),
+               fill = "white", color = "black") +
+  theme(axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank())
+```
+korea_sido$GID_1  : 시/도 영문 코드
+korea_sido$NAME_1  : 시/도 영문 이름
+korea_sido$VARNAME_1  : 언어별 시/도 이름
+korea_sido$NL_NAME_1  : 시/도 한자 이름
+korea_sido$TYPE_1  : 시/도 유형 (도/광역시/특별시)
+korea_sido$ENGTYPE_1  : 시/도 영문 유형 (Metropolitan City / Province / ...)
+korea_sido$HASC_1  : 시/도의 짧은 코드
+
+
+- 시/군/구
+```{r message=FALSE, warning=FALSE}
+korea_sigungu = getData(name = "GADM",
+                        country = "kor",
+                        level = 2)
+p3 <- ggplot(korea_sigungu) 
+p3 + geom_polygon(aes(x = long, y = lat, group = group),
+                  fill = "white", color = "black") +
+  labs(title = "Sigungu") +
+  theme(axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank())
+```
+korea_sigungu$NAME_1  : 시군구 소속 시도 (Seoul / Busan / ...)
+korea_sigungu$NAME_2  : 시군구 영문 이름 
+
+
+##### 서울에 속한 구
+```{r}
+seoul = korea_sigungu[korea_sigungu$NAME_1=="Seoul",]
+```
+```{r}
+head(seoul$GID_2)  # 시/군/구 코드
+```
+```{r}
+head(seoul$NAME_2)  # 시/군/구 영문 이름
+```
+
+
+```{r}
+# seoul$VARNAME_2  # 언어별 시/군/구 이름 
+head(seoul$NL_NAME_2)  # 시/군/구 한자 이름
+```
+```{r}
+head(seoul$TYPE_2)  # 시/군/구 유형
+```
+```{r}
+head(seoul$ENGTYPE_2)  # 시/군/구별 영문 유형
+# seoul$HASC_2  # 짧은 유형의 시군구 코드
+```
+
+
+
+```{r}
+korea_sido = getData(name = "GADM",
+                     country = "kor",
+                     level = 1)
+korea_sido@data
+```
+- 지역별로 두 집단에 대한 성과 분석을 한 결과 차이가 있다면 RESULT = 1
+- 차이가 없다면 RESULT = 0
+```{r}
+(sido_key = data.frame(NAME_1 = korea_sido$NAME_1,
+                      KOR = c("부산광역시", "충청북도", "충청남도", "대구광역시",
+                              "대전광역시", "강원도", "광주광역시", "경기도",
+                              "경상북도", "경상남도", "인천광역시",
+                              "제주특별자치도", "전라북도", "전라남도",
+                              "세종특별자치시", "서울특별시", "울산광역시"),
+                      RESULT = 1))
+```
+```{r}
+(korea_sido@data$id = rownames(korea_sido@data))
+```
+```{r}
+(korea_sido@data = merge(korea_sido@data, sido_key, by = "NAME_1"))
+```
+```{r results="hide"}
+(koreaDf = fortify(korea_sido))
+```
+```{r, results = "hide"}
+(koreaDf = merge(koreaDf, korea_sido@data, by = "id"))
+```
+```{r}
+ggplot() +
+   geom_polygon(data = koreaDf, aes(x = long, y = lat, group = group, fill = RESULT),
+                color = "black") +
+ labs(title = "지역별 두 그룹에 대한 성과 차이") +
+   theme(legend.position = "none",
+         axis.ticks = element_blank(),
+         axis.title = element_blank(),
+         axis.text = element_blank())
+
+```

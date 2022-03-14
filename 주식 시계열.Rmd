@@ -1,0 +1,307 @@
+---
+title: "07. 시계열"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+library(quantmod)
+library(xts)
+library(ggplot2)
+```
+
+#### Yahoo Finance에 등록된 Symbols을 이용해서 주가 정보를 불러옴
+
+#### 야후 금융: https://finance.yahoo.com/
+#### OANDA 환율: https://www.oanda.com/
+```{r}
+head(quantmod::oanda.currencies)
+```
+#### quantmod::oanda.currencies 각국환종에 대한 요약표를 제공
+#### 경제 데이터: https://fred.stlouisfed.org/
+#### 참고 : https://www.rdocumentation.org/packages/quantmod/versions/0.4.18/topics/getSymbols
+
+```{r message=FALSE, warning=FALSE}
+KOSPI = getSymbols("^KS11",
+                   from = "2001-01-01",
+                   to = Sys.time(),
+                   auto.assign = FALSE)  # 불러온 주가 정보를 자동으로 회사 이름으로 할당
+
+SEC = getSymbols("005930.KS",
+                 from = "2015-01-01",
+                 to = "2021-01-01",
+                 auto.assign = FALSE)
+# 삼성전자의 2015-01-01 ~ 2021-01-01
+```
+
+
+#### ggplot2 패키지를 이용하여 KOSPI 지수 시각화하기
+##### Cl(KOSPI) : 종가
+##### Op(KOSPI) : 시가
+##### Hi(KOSPI) : 고가
+##### Lo(KOSPI) : 저가
+##### Vo(KOSPI) : 거래량
+```{r}
+sample = data.frame(date = time(KOSPI),
+                    KOSPI,
+                    growth = ifelse(Cl(KOSPI) > Op(KOSPI),
+                                    "up", "down"))
+# 종가가 시가보다 높으면 "up", 아니면 "down"
+```
+```{r}
+colnames(sample) = c("date", "Open", "High", "Low",
+                     "Close", "Volume", "Adjusted", "growth")
+head(sample)
+```
+```{r}
+summary(sample)
+```
+#### 2022-01-01 ~ 2022-03-10의 Low값을 시각화
+```{r}
+ggplot(sample[sample$date >= "2022-01-01",], aes(x = date)) +
+   geom_linerange(aes(ymin = Low, ymax = High)) +  # 저가와 고가를 동시 표현
+   geom_rect(aes(xmin = date - 0.3,
+                 xmax = date + 0.3,
+                 ymin = pmin(Open, Close),
+                 ymax = pmax(Open, Close),
+                 fill = growth)) +  # 각 값마다 사각형 추가
+   guides(fill = "none") +  # 범례 삭제 
+   scale_fill_manual(values =c("down" = "blue", "up" = "red")) +  # "down"이면 blue, "up"이면 red
+   labs(
+     title = "KOSPI",
+     subtitle = "2022-01-01 ~ 2022-03-10"
+     ) +
+   theme(plot.title = element_text(face = "bold"),
+         plot.subtitle = element_text(hjust = 0.5),  # 부제의 위치
+         axis.title = element_blank(),  # 축 제목 제거
+         axis.line.x.bottom = element_line(color = "grey"),  # x축 색 
+         axis.ticks = element_line(color = "grey"), 
+         axis.line.y.left = element_line(color = "grey"),  # y축 색 
+         plot.background = element_rect(fill = "white"),  # plot의 뒷 배경 색
+         panel.background = element_rect(fill = "white")  # plot의 내부 배경 색
+        )
+```
+
+#### 시계열
+- 시계열 모형은 게절성 요인과 추세-순환 요인, 그리고 불규칙 요인으로 분해 가능
+
+##### 계절요인 S : 분기 혹은 특정 기간에 유사한 패턴
+##### 추세-순환 요인 T : 꾸준히 상승/하락, 전체적인 추세보다 작은 장기적 변화는 순환
+##### 불규칙 요인 R : 이외의 요인
+
+#### 가법모형 : y = S + T + R
+#### 승법모형 : y = S * T * R, log를 취할경우 가법모형으로 변환 가능
+
+#### 가법모형에서 S를 제거 => 원본 데이터에서 제거 (y - S)
+#### 승법모형에서 S를 제거 => 원본 데이터에서 나눔 (y / S)
+
+- KOSPI 지수 분해하기
+```{r message=FALSE, warning=FALSE}
+KOSPI = getSymbols("^KS11",
+                   from = "2001-01-01",
+                   to = Sys.time(),
+                   auto.assign = FALSE)
+str(KOSPI) # xts구조
+```
+```{r}
+KOSPI_C = na.omit(KOSPI$KS11.Close)
+KOSPI_C = as.numeric(KOSPI_C)
+```
+- 시계열 구조로 변경 (1년을 365로 나눔)
+```{r}
+ts_KOSPI_C = ts(data = KOSPI_C, frequency = 365)  
+```
+
+#### 가법모형 시계열 분해
+```{r}
+de_data_add = decompose(ts_KOSPI_C, type = "additive")
+str(de_data_add)
+plot(de_data_add)
+```
+#### 승법 모형 시계열 분해 
+```{r}
+de_data_multi = decompose(ts_KOSPI_C, type = "multiplicative")
+str(de_data_multi)
+plot(de_data_multi)
+```
+
+#### 시계열 회귀 모형 만들기
+#### 시계열 데이터 y = B0 + B1(추세요인) + B2(계절성 요인) + e
+```{r message=FALSE, warning=FALSE}
+KOSPI = getSymbols("^KS11",
+                   from = "2020-01-01",
+                   to = "2022-03-13",
+                   auto.assign = FALSE)
+```
+```{r}
+ggplot(KOSPI, aes(x = time(KOSPI), y = KS11.Close)) +
+  geom_line()
+```
+```{r}
+# ts데이터 변환
+library(forecast)
+ts_data = ts(data = as.numeric(KOSPI$KS11.Close),
+             frequency = 5) # 1년을 5일 간격
+# frequency : 계절성이 반복되는 주기 
+```
+
+#### 추세를 독립 변수로 활용한 시계열 회귀 모형
+```{r}
+fit_lm = tslm(ts_data ~ trend)
+summary(fit_lm)
+```
+```{r}
+ggplot(KOSPI, aes(x = time(KOSPI), y = KS11.Close)) +
+  geom_line() +
+  geom_line(y = fit_lm$fitted.values, color = "grey")
+```
+```{r}
+pred = data.frame(forecast(fit_lm, h = 20),  # 20일동안의 예측
+                  stringsAsFactors = FALSE)
+head(pred)
+```
+
+
+```{r}
+pred$Point.Forecast # 20일동안의 예측값
+```
+```{r}
+ggplot(pred, aes(x = index(pred), y = Point.Forecast)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), alpha = 0.25) +
+  geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), alpha = 0.5)
+```
+
+#### 계절성 요인 반영
+```{r}
+ts_data = ts(data = as.numeric(KOSPI$KS11.Close),
+             frequency = 12)  # 계절성의 주기 = 12 (월별 간격)
+```
+```{r}
+fitted = tslm(ts_data ~ trend + season)
+summary(fitted)
+```
+
+#### 추세와 계절성 요인을 독립변수로 활용한 시계열 회귀 모형 적합
+```{r}
+ggplot(KOSPI, aes(x = time(KOSPI), y = KS11.Close)) +
+  geom_line() +
+  geom_line(y = fitted$fitted.values, color = "grey")
+
+```
+
+#### 가변수 활용
+```{r}
+ts_data = ts(data = as.numeric(KOSPI$KS11.Close),
+             frequency = 20)
+t = time(ts_data) ; head(t)
+t.break = data.frame(t, ts_data) ; head(t.break)
+```
+
+- 2020년 3월 코로나로 인한 주가 하락 => 해당 시점의 데이터를 0으로 맞춤
+```{r}
+t.break[t.break$t < 3.65,] = 0
+t.break[t.break$t > 3.75,] = 0
+tb1 = ts(t.break$t, frequency = 20)
+```
+
+```{r}
+fit.t = tslm(ts_data ~ t)
+AIC(fit.t)
+```
+```{r}
+fit.tb = tslm(ts_data ~ t + I(t^2) + I(t^3) + I(tb1^3))
+AIC(fit.tb)
+```
+```{r}
+ggplot(ts_data, aes(x = time(ts_data))) +
+  geom_line(aes(y = ts_data)) +
+  geom_line(aes(y = fit.t$fitted.values),
+            color = "#7f7f7f", size = 1) +
+  geom_line(aes(y = fit.tb$fitted.values),
+            color = "#bcbcbc")
+```
+```{r}
+new = data.frame(t = t[length(t)] + seq(1, by = 0.05, length.out = 20))
+forecast(fit.t, newdata = new)
+```
+
+#### auto.arima를 이용하여 KOSPI 지수 예측하기
+##### 정상성과 차분
+- 정상성은 시간의 흐름에 영향X
+- 계절성이나 추세가 있는 시계열은 정상X
+- 정상성이 있는 시계열의 경우에는 시간에 따라 평평하게 변화, 일정한 분산
+
+##### 차분 : 정상성이 없는 시계열에 정상성을 나타냄
+- 로그변환과 같이 시계열의 분산에 대한 변화를 일정하게 유지
+- 정상성이 나타나는 시계열은 ACF가 0으로 빠르게 감소
+
+#### 단위근 검정을 통해 차분을 할지, 얼마나 할지 결정
+
+#### 단위근 검정
+```{r message=FALSE, warning=FALSE}
+library(urca)
+```
+```{r}
+KOSPI = getSymbols("^KS11",
+                   from = "2020-01-01",
+                   to = "2022-03-01",
+                   auto.assign = FALSE)
+ts_kospi = ts(as.numeric(KOSPI$KS11.Close), frequency = 20)
+```
+```{r}
+ur_test = ur.kpss(ts_kospi)
+summary(ur_test)
+```
+- 통계량 > 0.05 => 차분 필요
+
+#### 1차 차분
+```{r}
+dif_1 = diff(ts_kospi, differences = 1)
+ur_test2 = ur.kpss(dif_1)
+summary(ur_test2)
+```
+- 통계량 > 0.05 => 차분 필요
+
+#### 로그 변환 이후 2차 차분
+```{r}
+dif_2 = diff(log(ts_kospi), differences = 2)
+ur_test3 = ur.kpss(dif_2)
+summary(ur_test3)
+```
+- 통계량 < 0.05
+
+
+#### auto.arima
+- 잔차는 모형의 적합성을 판단하는 역할
+- 시계열 모형을 만들고 난 후 잔차를 확인했을 때, 자기상관이 없고 잔차의 평균은 0
+- 만약 자기상관이 있을경우 => 잔차에 아직도 정보가 남아있음
+- 잔차의 평균이 0이 아닐 경우 예측값이 한쪽으로 편향
+```{r}
+(fit = auto.arima(ts_kospi))
+```
+
+
+##### 적합한 모형의 자기상관이 있는지 판단  
+##### Ljung-Box 검정 (귀무가설 : 모형에 자기상관이 없다)
+```{r}
+checkresiduals(fit)
+```
+- 귀무가설 기각X
+- 특정범위 내에서 ACF값이 변화
+
+- 다가올 5일 예측
+```{r}
+(fore = data.frame(forecast(fit, h = 5)))
+```
+```{r}
+ggplot(fore, aes(x = index(fore), y = Point.Forecast)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = Lo.95, ymax = Hi.95), alpha = 0.25) +
+  geom_ribbon(aes(ymin = Lo.80, ymax = Hi.80), alpha = 0.5)
+```
+

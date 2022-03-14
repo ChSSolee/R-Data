@@ -1,0 +1,382 @@
+---
+title: "06. 뉴스 키워드"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 자연어 처리
+#### 절차
+1) 수집
+2) 전처리 (어휘분석, 불용어 처리, 형태소 분석)
+3) 문서 표현 (VSM, Word Embedding, Documenet Embedding)
+4) 차원 축소 (LSI, PCA, LDA)
+5) 활용 (분류, 감성 분석, 정보 검색, 문서 요약, 챗봇, 기계 번역)
+6) 평가 (혼동행렬, ROC, 정확도, 정밀도, 재현율, F1-Score)
+
+
+
+- 불용어 : 불필요한 용어
+- 형태소 분석 (Stemming) : 공통 어간을 가지는 단어를 묶는 작업을 Stemming
+- 형태소 분석을 진행하기 위해 말뭉치 사전(Corpus) 필요, (SejongDic, NIADic)
+- 정제된 텍스트 데이터는 n차원의 행렬로 구성 -> VSM(벡터 공간 모델), TVM(단어 벡터 모델) (Bag-of-words, N-gram, Ontology-based)
+- 벡터 공간 모델의 차원을 축소 -> 분류(Document Classification), 감성 분석 (SNA)
+
+
+
+```{r message=FALSE, warning=FALSE}
+library(rJava)
+```
+- 오류 발생시 installr 패키지 다운
+source("https://install-github.me/talgalili/installr")
+installr::install.java()
+```{r message=FALSE, warning=FALSE}
+library(remote)
+```
+```{r}
+library(KoNLP)
+```
+remotes::install_github("haven-jeon/KoNLP", upgrade = "never", INSTALL_opts = c("--no-multiarch"))
+
+
+#### httr 패키지를 이용하여 뉴스 데이터 수집하기
+```{r}
+library(httr)
+```
+```{r}
+```
+
+
+네이버 오픈 API 종류 : https://developers.naver.com/docs/common/openapiguide/apilist.md
+```{r}
+URL = "https://openapi.naver.com/v1/search/news.json?"  # 네이버 뉴스 검색 API
+search = "황의조"  # 키워드
+cId <- "Mt8I_pQDaWDTGHwSd_pN" 
+cSec <- "0BGjzmfDrz"
+
+news = GET(url = URL,  # URL
+           add_headers("X-Naver-Client-Id" = cId,
+                       "X-Naver-Client-Secret" = cSec),
+           query = list(query = search,  # 키워드
+                        display = 100,  # 100개
+                        start = 1,  # 검색 결과 몇 번째 페이지 부터 조회할지 결정
+                        sort = "date"))  # 날짜순 정렬
+```
+```{r}
+```
+```{r}
+httr::content(news)$total # 전체 뉴스 건수
+```
+httr::content(news)
+httr::content(news)$item
+
+
+
+
+#### 뉴스 키워드 분석
+```{r}
+all_news = data.frame()
+URL = "https://openapi.naver.com/v1/search/news.json?"
+search = "황의조"
+
+for(i in 1:10){
+  param = list(query = search,
+               display = 100,
+               start = i, 
+               sort = "date")
+  news = GET(url = URL,
+             add_headers("X-Naver-Client-Id" = cId,
+                         "X-Naver-Client-Secret" = cSec),
+             query = param)
+  body = data.frame(t(sapply(httr::content(news)$item, data.frame)))
+  all_news = rbind(all_news, body)
+  Sys.sleep(0.1)
+}
+dim(all_news)
+
+```
+```{r}
+all_news[1,1]
+```
+
+
+#### 뉴스 데이터 분석하기
+```{r}
+all_news$title[1:10]  # 10개의 기사 제목
+```
+
+
+- 모든 기사의 제목에 포함된 <b>, </b>, &quot을 제거
+```{r}
+pat = "<b>|</b>|&quot;" ; rep = ""
+title = gsub(pattern = pat,
+             replacement = rep,
+             x = all_news$title)
+head(title, 10)
+```
+
+
+사전 설정
+```{r message=FALSE, warning=FALSE}
+useNIADic()  # useSejongDic()
+```
+명사 추출
+```{r}
+noun_list = extractNoun(title); head(noun_list)
+```
+BoW추출을 위해 명사가 몇 번 등장했는지 확인 (빈도수 테이블)
+```{r}
+tb_noun = table(unlist(noun_list))
+length(tb_noun)
+head(tb_noun)
+```
+```{r}
+df_noun = data.frame(tb_noun)
+(top10_noun = head(df_noun, 10))
+```
+
+
+#### 시각화
+- 두 글자 이상인 것들에 대해서 빈도의 시각화
+```{r}
+library(ggplot2)
+df_noun$Var1 = as.character(df_noun$Var1)  # 문자형으로 변경
+df_noun = df_noun[nchar(df_noun$Var1) > 1,]  # 2글자 이상인 것들만 저장
+(top10_noun = head(df_noun, 10))
+```
+```{r}
+ggplot(top10_noun) +
+  geom_bar(aes(x = reorder(Var1, -Freq), y = Freq), stat = "identity")
+```
+
+#### 사전에 단어 추가
+```{r}
+term <- c("PSG", "벤투")
+userDic <- data.frame(term = term, tag = "ncn")
+```
+term의 단어들을 명사(ncn)으로 추가
+```{r}
+buildDictionary(ext_dic = c("NIADic", "woorimalsam", "insighter", "sejong"),
+                user_dic = userDic,
+                replace_usr_dic = T)
+```
+
+
+### 워드클라우드
+```{r message=FALSE, warning=FALSE}
+library(wordcloud2)
+library(htmlwidgets)
+library(jsonlite)
+library(yaml)
+library(base64enc)
+library(wordcloud)
+library(RColorBrewer)
+library(wordcloud2)
+```
+library(devtools)
+install_github("lchiffon/wordcloud2")
+
+
+#### 전처리
+gsub("[\r\n\t]", ' ', news) : 이스케이프 제거
+gsub('[[:punct:]]', ' ', news_pre) : 문장부호 제거
+gsub('[[:cntrl:]]', ' ', news_pre) : 특수문자 제거
+gsub('\\d+', ' ', news_pre)   : 숫자 제거  
+gsub('[a-z]+', ' ', news_pre) : 영 대문자 제거
+gsub('[A-Z]+', ' ', news_pre) : 영 소문자 제거
+gsub('\\s+', ' ', news_pre) : 2개 이상 공백 교체 
+
+
+```{r}
+pat = "<b>|</b>|&quot;|Q&amp;A" ; rep = ""
+title = gsub(pattern = pat, replacement = rep, x = all_news$title)
+title <- gsub('[[:punct:]]', replacement = rep, title) 
+title <- gsub('[[:cntrl:]]', replacement = rep, title) 
+title <- gsub('\\d+', rep, title)
+head(title, 10)
+```
+
+
+- 명사 추출
+```{r}
+noun_list = extractNoun(title)
+```
+- 단어 빈도 테이블
+```{r}
+tb_noun = table(unlist(noun_list))
+```
+- 문자형으로 변경
+```{r}
+df_noun = data.frame(tb_noun)
+df_noun$Var1 = as.character(df_noun$Var1)  #
+```
+- 두 글자 이상인 것들만 저장
+```{r}
+df_noun = df_noun[nchar(df_noun$Var1) > 1,]
+```
+
+
+#### wordcloud 기본 시각화
+- word : 단어
+- freq : 단어들의 빈도
+- size : 가장빈도가 큰 단어와 빈도가 가장 작은 단어 폰트 사이의 크기 차이
+- min.freq : 출력될 단어의 최소 빈도
+- max.word : 출력될 단어들의 최대개수
+- random.order : TRUE 이면 램덤으로 단어출력, FALSE 이면 빈도수가 큰 단어일수록 중앙에 배치
+- random.color : TRUE 이면 단어색은 랜덤순으로 정해지고, FALSE이면 빈도순으로 정해짐
+- rot.per : 90도로 회전된 각도로 출력되는 단어의 비율
+- colors : 가장 작은 빈도부터 큰 빈도까지의 단어색
+
+
+```{r}
+wordcloud(words = df_noun$Var1, 
+          freq = df_noun$Freq,
+          random.order = F, 
+          min.freq = 10,  
+          colors = brewer.pal(8, "Dark2"))
+```
+
+#### wordcloud2 
+- data : 단어(word)와 빈도(freq) 컬럼을 갖는 데이터프레임
+- size : 폰트 사이즈
+- minSize : 서브타이틀 문자열
+- gridSize : 그리드 사이즈
+- fontFamily : 폰트 지정
+- fontWeight : 폰트 볼드체 여부 지정 가능 (normal / bold / 600)
+- color : 텍스트 색상 팔레트 (random-dark / random-light / 기타 컬러 벡터)
+- backgroundColor : 배경 색 지정
+- minRotation : 워드클라우드의 단어들을 회전시키려는 경우, 최소 회전각(rad 단위 입력) (* default : -pi/4)
+- maxRotation : 워드클라우드의 단어들을 회전시키려는 경우, 최대 회전각(rad 단위 입력) (* default : pi/4)
+- shuffle : (TRUE : 같은 데이터프레임이 주어져도 워드클라우드를 그릴 때마다 다른 결과값 표시)
+- rotateRatio : 단어의 회전 확률 조절
+- shape : 워드클라우드 형태(도형) 결정 (circle / cardioid / diamond / triangle-forward / triangle / pentagon / star)
+- ellipticity : 워드클라우드 셰이프의 평평한 정도
+- widgetsize  : 위젯 사이즈
+- figPath  : 형태를 이미지 마스크로 지정할 경우, 해당 이미지의 경로와 파일명
+
+
+```{r}
+wordcloud2(data = df_noun,
+           color = "random-dark",
+           shape = "circle",
+           fontFamily = "맑은고딕",
+           fontWeight = 550,
+           size = 2,
+           widgetsize = c(900, 500))
+```
+
+```{r}
+wordcloud2(df_noun, figPath = "C:/Users/이찬솔/Desktop/숭실/R/실무 예제/Uijo.png")
+```
+
+```{r}
+letterCloud(df_noun, "HWANG", wordSize = 1)
+```
+
+
+### 오늘의 뉴스 그래프로 분석하기
+```{r}
+URL = "https://openapi.naver.com/v1/search/news.json?"
+search = "이강인"
+
+all_news = data.frame()
+for(i in 1:100){
+   param = list(query = search,
+                display = 100,
+                start = i,
+                sort = "sim")
+   news = GET(url = URL,
+              add_headers("X-Naver-Client-Id" = cId,
+                          "X-Naver-Client-Secret" = cSec),
+              query = param)
+   body = data.frame(t(sapply(httr::content(news)$item, data.frame)))
+        
+   all_news = rbind(all_news, body)
+   Sys.sleep(0.1)
+}
+```
+
+
+```{r}
+all_news[1,5]
+```
+```{r}
+format(Sys.time(), "%Y-%m-%d %a")
+```
+```{r}
+Sys.getlocale()
+Sys.setlocale(category = "LC_TIME", locale = "C")
+```
+```{r}
+head(all_news$pubDate)
+```
+```{r}
+all_news$pubDate = as.Date(unlist(all_news$pubDate), "%a, %d %b %Y")
+head(all_news$pubDate)
+```
+
+
+```{r}
+ggplot(all_news, aes(x = pubDate)) +
+   geom_line(stat = "count", color = "#EEEEEE", size = 1.5) + 
+   geom_point(stat = "count", color = "#424242", size = 2) +
+   geom_text(aes(label = ..count..),
+             stat = "count",
+             position = position_nudge(y = 150)) +
+   labs(title = "전기자동차 뉴스 트렌드") +
+   xlab("날짜") +
+   ylab("") +
+   scale_x_date(date_labels = "%m-%d") +
+   theme(text = element_text(size = 15),
+         panel.background = element_blank(),
+         axis.ticks = element_blank())
+```
+
+
+```{r}
+pat = "<b>|</b>|&quot;|Q&amp;A" ; rep = ""
+all_news$title = gsub(pattern = pat, replacement = rep, x = all_news$title)
+all_news$title <- gsub('[[:punct:]]', replacement = rep, all_news$title) 
+all_news$title <- gsub('[[:cntrl:]]', replacement = rep, all_news$title)
+all_news$title <- gsub('\\d+', rep, title)
+```
+```{r}
+top <- data.frame(1:10)
+for(i in 1:length(unique(all_news$pubDate))) {
+   sub_news = all_news[all_news$pubDate == sort(unique(all_news$pubDate))[i],]  
+   df_target = data.frame(table(unlist(strsplit(sub_news$title, " "))))
+   df_target = df_target[order(df_target$Freq, decreasing = TRUE),]
+   df_target$Var1 = as.character(df_target$Var1)
+   df_target = df_target[nchar(df_target$Var1) > 1 & nchar(df_target$Var1) < 7, ]
+   
+   top10 = head(df_target, 10)
+   if (length(top10) < 10) {
+      dif <- nrow(top) - nrow(top10)
+      top10 <- data.frame(Var1 <- c(top10$Var1, rep(NA, dif)), Freq <- c(top10$Freq, rep(NA, dif)))
+      colnames(top10) = c("Var1", "Freq")
+   }
+   top <- cbind(top, top10)
+}
+```
+```{r}
+top <- t(top)
+top <- top[-1, ]
+```
+```{r}
+key <- matrix(nrow = length(unique(all_news$pubDate)), ncol = 10)
+for (i in 1:nrow(top)) {
+   if (i%%2 == 1) {
+      k <- i/2 + 1
+      key[k,] <- top[i,]
+   }
+}
+rownames(key) <- as.character(unique(all_news$pubDate))
+colnames(key) <- paste(c(1:10), "위")
+```
+```{r echo = FALSE, results = 'axis'}
+library(knitr)
+kable(key)
+```
+

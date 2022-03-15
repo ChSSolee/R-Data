@@ -24,7 +24,7 @@ library(ggplot2)
 
 <br/>
 
-#### YouTube API를 통한 영상 정보 수집
+### YouTube API를 통한 영상 정보 수집
 
 ```javascript
 yt_oauth(app_id = app_id,
@@ -77,7 +77,7 @@ round$commentCount <- as.integer(round$commentCount)
 <br/>
 
 
-#### 경기 영상별 조회 수 시각화
+### 경기 영상별 조회 수 시각화
 ```javascript
 ggplot(round, aes(x = title, y = viewCount)) +
   geom_bar(fill = "#F07777", colour = "#E74C3C", stat = "identity") +
@@ -92,12 +92,13 @@ ggplot(round, aes(x = title, y = viewCount)) +
         axis.ticks = element_blank(),
         axis.text.y = element_blank())
 ```
+<img width="750" height="550" src="https://user-images.githubusercontent.com/100699925/158409834-c433fbfc-7529-4477-a08e-5ace02ef8c69.png">
 
 
 <br/>
 
 
-#### 경기 영상별 댓글 수 시각화
+### 경기 영상별 댓글 수 시각화
 ```javascript
 ggplot(round, aes(x = title, y = commentCount)) +
   geom_bar(fill = "#D7BDE2", colour = "#A569BD", stat = "identity") +
@@ -112,12 +113,12 @@ ggplot(round, aes(x = title, y = commentCount)) +
         axis.ticks = element_blank(),
         axis.text.y = element_blank())
 ```
-
+<img width="750" height="550" src="https://user-images.githubusercontent.com/100699925/158409829-5226523e-7237-475f-94c1-7885e44cc3a2.png">
 
 <br/>
 
 
-#### 경기 영상별 좋아요 수 시각화
+### 경기 영상별 좋아요 수 시각화
 ```javascript
 ggplot(round, aes(x = title, y = likeCount)) +
   geom_bar(fill = "#A9CCE3", colour = "#5499C7", stat = "identity") +
@@ -132,16 +133,22 @@ ggplot(round, aes(x = title, y = likeCount)) +
         axis.ticks = element_blank(),
         axis.text.y = element_blank())
 ```
-
+<img width="750" height="550" src="https://user-images.githubusercontent.com/100699925/158409838-32b56ae4-ad11-45a5-9faa-9371838f70f6.png">
 
 <br/>
 
 
-#### 영상 댓글 수집하기
+### 영상 댓글 수집하기
 - 2021-09-02 | 대한민국 0:0 이라크 | 하이라이트 영상 (https://www.youtube.com/watch?v=tD3Rt0G5DzQ)과 2021-10-12 | 이란 1:1 대한민국 |  하이라이트 영상 (https://www.youtube.com/watch?v=dilLNo2tXaE)은 get_all_comments() 적용에 있어 오류발생
 - 이에 따라 다른 YouTube채널(쿠팡플레이)의 유사한 영상으로 대체 혹은 수집에서 제외
 ```javascript
 video_id
+```
+```
+## [1] "tD3Rt0G5DzQ" "KpeMHJt51dM" "moWz-iJt21A" "dilLNo2tXaE" "IwgZhtMLx3s"
+## [6] "aVNcxjMxnHg" "TYT15A1ZzQQ" "SvtTEEOuokc"
+```
+```javascript
 # cmt1 <- get_all_comments(video_id = video_id[1])
 cmt2 <- get_all_comments(video_id = video_id[2])
 cmt3 <- get_all_comments(video_id = video_id[3])
@@ -152,9 +159,15 @@ cmt7 <- get_all_comments(video_id = video_id[7])
 cmt8 <- get_all_comments(video_id = video_id[8]) 
 names(cmt8)
 ```
+```
+##  [1] "videoId"               "textDisplay"           "textOriginal"         
+##  [4] "authorDisplayName"     "authorProfileImageUrl" "authorChannelUrl"     
+##  [7] "authorChannelId.value" "canRate"               "viewerRating"         
+## [10] "likeCount"             "publishedAt"           "updatedAt"            
+## [13] "id"                    "parentId"              "moderationStatus"
+```
 
-
-#### RcppMeCab 패키지를 이용하여 한글 자연어 처리
+### RcppMeCab 패키지를 이용하여 한글 자연어 처리
 ```javascript
 library(RcppMeCab)
 library(RmecabKo)
@@ -174,11 +187,19 @@ cmt8_pos <- posParallel(sentence = cmt8$textOriginal, format = "data.frame")
 ```javascript
 head(cmt2_pos)
 ```
+```
+##   doc_id sentence_id token_id   token   pos subtype
+## 1      1           1        1 VICTORY    SL        
+## 2      1           1        2       !    SF        
+## 3      1           1        3       !    SF        
+## 4      2           1        1      잘   MAG        
+## 5      2           1        2      봤 VV+EP        
+## 6      2           1        3    어요    EF
+```
 
 
 
-
-#### 긍정/부정 사전을 이용하여 감성 분석
+### 긍정/부정 사전을 이용하여 감성 분석
 - KNU 한국어 감성사전 (https://github.com/park1200656/KnuSentiLex)의 긍정/부정사전을 각각 로드
 - 부정 단어에는 -1, 긍정 단어에는 1로 구분
 ```javascript
@@ -189,9 +210,27 @@ posi = readLines("pos_pol_word.txt", encoding = "UTF-8")
 negoWord = data.frame(keyword = nego, value = -1)
 head(negoWord)
 ```
+```
+##        keyword value
+## 1         가난    -1
+## 2     가난뱅이    -1
+## 3     가난살이    -1
+## 4 가난살이하다    -1
+## 5     가난설음    -1
+## 6       가난에    -1
+```
 ```javascript
 posiWord = data.frame(keyword = posi, value = 1)
 head(posiWord)
+```
+```
+##   keyword value
+## 1     (-;     1
+## 2    (^^)     1
+## 3   (^-^)     1
+## 4    (^^*     1
+## 5   (^_^)     1
+## 6   (^o^)     1
 ```
 
 
@@ -216,7 +255,7 @@ sentiment_8 <- compareCmt(cmt8_pos)
 ```
 
 
-#### 댓글별로 등장한 긍정 키워드와 부정 키워드의 숫자를 더해, 댓글별로 긍정/부정의 점수를 분류
+### 댓글별로 등장한 긍정 키워드와 부정 키워드의 숫자를 더해, 댓글별로 긍정/부정의 점수를 분류
 - 각각의 댓글에 포함된 긍정/부정 단어들의 빈도를 aggregate()함수로 총합하여, 그에 따라 점수를 계산하고 댓글의 긍정/부정의 정도를 파악
 - 댓글의 점수 : 0  => 중립
 - 댓글의 점수 > 0  => 긍정
@@ -268,7 +307,7 @@ res[5] <- round(res[5]*100, 2)
 res$title <- title[-1]
 ```
 
-긍정 | 부정 | 중립 | 긍정 비율 | 부정 비율 | title |
+**긍정** | **부정** | **중립** | **긍정 비율** | **부정 비율** | **title** |
 ---- | ---- | ---- | ---- | ---- | ---- |
 2 | 262 | 209 | 47 | 50.58 | 40.35 | 2R 레바논전 |
 3 | 458 | 490 | 102 | 43.62 | 46.67 | 3R 시리아전 |
@@ -278,9 +317,9 @@ res$title <- title[-1]
 7 | 177 | 129 | 44 | 50.57 | 36.86 | 7R 레바논전 |
 8 | 246 | 196 | 57 | 49.30 | 39.28 | 8R 시리아전 |
 
+<br/>
 
-
-#### 경기 영상별 댓글의 긍정 비율 시각화
+### 경기 영상별 댓글의 긍정 비율 시각화
 ```javascript
 ggplot(res, aes(x = title, y = `긍정 비율`)) +
   geom_bar(fill = "#73C6B6", colour = "#52BE80", stat = "identity") +
@@ -294,3 +333,4 @@ ggplot(res, aes(x = title, y = `긍정 비율`)) +
         axis.ticks = element_blank(),
         axis.text.y = element_blank())
 ```
+<img width="750" height="550" src="https://user-images.githubusercontent.com/100699925/158409824-2d8fe3d8-1954-4a9c-a3c4-50454f93b09e.png">

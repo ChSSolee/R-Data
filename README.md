@@ -32,9 +32,7 @@ yt_oauth(app_id = app_id,
          token = "")
 ```
 ```javascript
-
-
-= c("tD3Rt0G5DzQ", "KpeMHJt51dM", "moWz-iJt21A", "dilLNo2tXaE",
+video_id = c("tD3Rt0G5DzQ", "KpeMHJt51dM", "moWz-iJt21A", "dilLNo2tXaE",
              "IwgZhtMLx3s", "aVNcxjMxnHg", "TYT15A1ZzQQ", "SvtTEEOuokc")
 title <- c("1R 이라크전", "2R 레바논전", "3R 시리아전", "4R 이란전", "5R UAE전", "6R 이라크전", "7R 레바논전", "8R 시리아전")
 ```
@@ -46,26 +44,34 @@ for (i in 1:length(video_id)) {
 }
 round <- cbind(title, round)
 ```
-title |	id | viewCount	| likeCount	| favoriteCount	| commentCount
----- | ---- | ---- | ---- | ---- | ---- |
-1R 이라크전	| tD3Rt0G5DzQ	| 899422	| 5362	| 0	| 4418
-2R 레바논전	| KpeMHJt51dM	| 869906	| 5597	| 0	| 2791
-3R 시리아전	| moWz-iJt21A	| 1696184	| 11743	| 0	| 5377
-4R 이란전	| dilLNo2tXaE	| 1287991	| 8735	| 0	| 4531
-5R UAE전	| IwgZhtMLx3s	| 1558372	| 11789	| 0	| 3849
-6R 이라크전	| aVNcxjMxnHg	| 2409278	| 21574	| 0	| 3177
-7R 레바논전	| TYT15A1ZzQQ	| 1029614	7255	| 0	| 1792
-8R 시리아전	| SvtTEEOuokc	| 1025858	| 10064	| 0	| 2040
-
-
-<br/>
-
-
 ```javascript
 round$viewCount <- as.integer(round$viewCount)
 round$likeCount <- as.integer(round$likeCount)
 round$commentCount <- as.integer(round$commentCount)
 ```
+
+<br/>
+
+**title** |	**id** | **viewCount**	| **likeCount**	| **favoriteCount**	| **commentCount** |
+| ---- | ---- | ---- | ---- | ---- | ---- |
+1R 이라크전	| tD3Rt0G5DzQ	| 899422	| 5362	| 0	| 4418
+2R 레바논전	| KpeMHJt51dM	| 869906	| 5597	| 0	| 2791
+3R 시리아전	| moWz-iJt21A	| 1696184 | 11743	| 0	| 5377
+4R 이란전	| dilLNo2tXaE	| 1287991 | 8735	| 0	| 4531
+5R UAE전	| IwgZhtMLx3s	| 1558372 | 11789 | 0 | 3849
+6R 이라크전	| aVNcxjMxnHg	| 2409278	| 21574	| 0	| 3177
+7R 레바논전	| TYT15A1ZzQQ	| 1029614	| 7255	| 0	| 1792
+8R 시리아전	| SvtTEEOuokc	| 1025858	| 10064	| 0	| 2040
+
+- id : 해당 영상의 코드
+- viewCount : 해당 영상의 조회수
+- likeCount : 해당 영상의 좋아요 수
+- commentCount : 해당 영상의 댓글 수
+
+<br/>
+
+
+
 
 
 <br/>
@@ -261,11 +267,16 @@ res[4] <- round(res[4]*100, 2)
 res[5] <- round(res[5]*100, 2)
 res$title <- title[-1]
 ```
-```{r echo = FALSE, results = 'axis'}
-library(knitr)
-kable(res)
-```
 
+긍정 | 부정 | 중립 | 긍정 비율 | 부정 비율 | title |
+---- | ---- | ---- | ---- | ---- | ---- |
+2 | 262 | 209 | 47 | 50.58 | 40.35 | 2R 레바논전 |
+3 | 458 | 490 | 102 | 43.62 | 46.67 | 3R 시리아전 |
+4 | 313 | 375 | 71 | 41.24 | 49.41 | 4R 이란전 |
+5 | 628 | 347 | 113 | 57.72 | 31.89 | 5R UAE전 |
+6 | 508 | 225 | 77 | 62.72 | 27.78 | 6R 이라크전 |
+7 | 177 | 129 | 44 | 50.57 | 36.86 | 7R 레바논전 |
+8 | 246 | 196 | 57 | 49.30 | 39.28 | 8R 시리아전 |
 
 
 

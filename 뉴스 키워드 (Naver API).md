@@ -455,8 +455,8 @@ theme(axis.title = element_text(size = 12),
 ```
 
 
-    
-![png](output_38_0.png)
+<img width="750" height="550" src="https://user-images.githubusercontent.com/100699925/158916049-63e20d61-ec38-47df-a71c-0bfa6296a987.png">
+
     
 
 
@@ -498,8 +498,9 @@ wordcloud(words = df_noun$Var1,
 ```
 
 
+<img width="600" height="550" src="https://user-images.githubusercontent.com/100699925/158916051-cb90ff00-02a4-4f7c-b780-09ac3da48b92.png">
     
-![png](output_42_0.png)
+
     
 
 
@@ -536,6 +537,7 @@ wordcloud2(data = df_noun,
 ```
 
 
+![png](output_42_0.png)
 
 
 
@@ -549,6 +551,7 @@ wordcloud2(data = df_noun,
 wordcloud2(df_noun, figPath = "C:/rp/uijo.png")  
 ```
 
+![png](output_42_0.png)
 
 
 
@@ -562,6 +565,7 @@ wordcloud2(df_noun, figPath = "C:/rp/uijo.png")
 letterCloud(df_noun, word = "HWANG", size = 1)
 ```
 
+![png](output_42_0.png)
 
 
 
@@ -672,7 +676,7 @@ ggplot(all_news, aes(x = pubDate)) +
 
 
     
-![png](output_57_0.png)
+<img width="750" height="550" src="https://user-images.githubusercontent.com/100699925/158916052-a250173d-8483-41d2-a70d-3928676f9f9d.png">
     
 
 

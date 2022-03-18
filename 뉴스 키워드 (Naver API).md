@@ -10,7 +10,7 @@
 - 벡터 공간 모델의 차원을 축소 -> 분류(Document Classification), 감성 분석 (SNA)
 
 
-```R
+```javascript
 library(rJava)
 library(httr)
 library(KoNLP)
@@ -42,9 +42,9 @@ news = GET(url = URL,  # URL
 httr::content(news)$total # 전체 뉴스 건수
 ```
 
-
+```
 67635
-
+```
 
 
 ```R
@@ -52,19 +52,16 @@ names(httr::content(news))
 ```
 
 
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'lastBuildDate'</li><li>'total'</li><li>'start'</li><li>'display'</li><li>'items'</li></ol>
-
+```
+'lastBuildDate''total''start''display''items'
+```
 
 
 
 ```R
 head(httr::content(news)$item)
 ```
+
 
 
 <ol>
@@ -174,14 +171,9 @@ for(i in 1:10){
 dim(all_news)
 ```
 
-
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>1000</li><li>5</li></ol>
-
+```
+10005
+```
 
 
 
@@ -189,14 +181,9 @@ dim(all_news)
 names(all_news)
 ```
 
-
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'title'</li><li>'originallink'</li><li>'link'</li><li>'description'</li><li>'pubDate'</li></ol>
-
+```
+'title''originallink''link''description''pubDate'
+```
 
 
 
@@ -205,18 +192,13 @@ all_news$title[1:10]
 ```
 
 
-<ol>
-	<li>'이제는 영혼의 파트너! &lt;b&gt;황의조&lt;/b&gt;-조규성, 이란 격파 선봉장으로'</li>
-	<li>'\'국대 발탁\' 조규성, &amp;quot;&lt;b&gt;황의조&lt;/b&gt;는 내 우상, 골로 증명하겠다&amp;quot;'</li>
-	<li>'메시 아버지, “바르셀로나와 메시 복귀 논의 중”'</li>
-	<li>'\'물오른 활약상에 의욕 충만\' 조규성, &amp;quot;이란·UEA전 모두 득점 노리겠다&amp;quot;'</li>
-	<li>'\'국가대표\' 조규성-박지수-권창훈, &amp;quot;수사불패 정신으로 임하겠다&amp;quot;'</li>
-	<li>'\'보르도에게 대재앙\'…몽펠리에, &lt;b&gt;황의조&lt;/b&gt; 영입 고려'</li>
-	<li>'조규성이 밝힌 꾸준한 대표팀 승선 배경… “자신감과 웨이트”'</li>
-	<li>'\'서울E 최초 국대 발탁\' 이재익, &amp;quot;구단 역사에 한 획, 들뜨지 않을게요&amp;quot;'</li>
-	<li>'원점으로 돌아간 벤투호…원톱은 누가 될까?'</li>
-	<li>'[김남구의 유럽통신] 보르도 감독, “&lt;b&gt;황의조&lt;/b&gt;, 개선할 미세한 부분 많아”'</li>
-</ol>
+```
+'이제는 영혼의 파트너   황의조  조규성  이란 격파 선봉장으로'' 국대 발탁  조규성    황의조 는 내 우상  골로 증명하겠다 '
+'메시 아버지   바르셀로나와 메시 복귀 논의 중 '' 물오른 활약상에 의욕 충만  조규성   이란 UAE전 모두 득점 노리겠다 '
+' 국가대표  조규성 박지수 권창훈   수사불패 정신으로 임하겠다 '' 보르도에게 대재앙  몽펠리에   황의조  영입 고려'
+'조규성이 밝힌 꾸준한 대표팀 승선 배경   자신감과 웨이트 '' 서울E 최초 국대 발탁  이재익   구단 역사에 한 획  들뜨지 않을게요 '
+'원점으로 돌아간 벤투호 원톱은 누가 될까 '' 김남구의 유럽통신  보르도 감독    황의조   개선할 미세한 부분 많아 '
+```
 
 
 
@@ -243,13 +225,14 @@ title <- gsub('\\d+', replacement = rep, title)
 head(title, 10)
 ```
 
+```
 
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li><span style=white-space:pre-wrap>'이제는 영혼의 파트너   황의조  조규성  이란 격파 선봉장으로'</span></li><li><span style=white-space:pre-wrap>' 국대 발탁  조규성    황의조 는 내 우상  골로 증명하겠다 '</span></li><li><span style=white-space:pre-wrap>'메시 아버지   바르셀로나와 메시 복귀 논의 중 '</span></li><li><span style=white-space:pre-wrap>' 물오른 활약상에 의욕 충만  조규성   이란 UAE전 모두 득점 노리겠다 '</span></li><li><span style=white-space:pre-wrap>' 국가대표  조규성 박지수 권창훈   수사불패 정신으로 임하겠다 '</span></li><li><span style=white-space:pre-wrap>' 보르도에게 대재앙  몽펠리에   황의조  영입 고려'</span></li><li><span style=white-space:pre-wrap>'조규성이 밝힌 꾸준한 대표팀 승선 배경   자신감과 웨이트 '</span></li><li><span style=white-space:pre-wrap>' 서울E 최초 국대 발탁  이재익   구단 역사에 한 획  들뜨지 않을게요 '</span></li><li>'원점으로 돌아간 벤투호 원톱은 누가 될까 '</li><li><span style=white-space:pre-wrap>' 김남구의 유럽통신  보르도 감독    황의조   개선할 미세한 부분 많아 '</span></li></ol>
+'이제는 영혼의 파트너   황의조  조규성  이란 격파 선봉장으로'' 국대 발탁  조규성    황의조 는 내 우상  골로 증명하겠다 '
+'메시 아버지   바르셀로나와 메시 복귀 논의 중 '' 물오른 활약상에 의욕 충만  조규성   이란 UAE전 모두 득점 노리겠다 '
+' 국가대표  조규성 박지수 권창훈   수사불패 정신으로 임하겠다 '' 보르도에게 대재앙  몽펠리에   황의조  영입 고려'
+'조규성이 밝힌 꾸준한 대표팀 승선 배경   자신감과 웨이트 '' 서울E 최초 국대 발탁  이재익   구단 역사에 한 획  들뜨지 않을게요 '
+'원점으로 돌아간 벤투호 원톱은 누가 될까 '' 김남구의 유럽통신  보르도 감독    황의조   개선할 미세한 부분 많아 '
+```
 
 
 
@@ -264,8 +247,6 @@ head(title, 10)
 useNIADic()  # useSejongDic()
 ```
 
-    Backup was just finished!
-    1213109 words dictionary was built.
     
 
 #### 명사 추출
@@ -275,52 +256,14 @@ useNIADic()  # useSejongDic()
 noun_list = extractNoun(title); head(noun_list)
 ```
 
-
-<ol>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'영혼'</li><li>'파트너'</li><li>'황의조'</li><li>'조규'</li><li>'성'</li><li>'이란'</li><li>'격파'</li><li>'선봉장'</li><li>'로'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'국대'</li><li>'발탁'</li><li>'조규'</li><li>'성'</li><li>'황의조'</li><li>'내'</li><li>'우상'</li><li>'증명하겠'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'메시'</li><li>'아버지'</li><li>'바르셀로나'</li><li>'메시'</li><li>'복귀'</li><li>'논'</li><li>'중'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'활약상'</li><li>'의욕'</li><li>'충만'</li><li>'조규'</li><li>'성'</li><li>'이란'</li><li>'UAE'</li><li>'전'</li><li>'득점'</li><li>'노리겠'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'국가대표'</li><li>'조규'</li><li>'성'</li><li>'박지수'</li><li>'권창훈'</li><li>'수사'</li><li>'불패'</li><li>'정신'</li><li>'임하겠'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'보르도'</li><li>'대재앙'</li><li>'몽펠리에'</li><li>'황의조'</li><li>'영입'</li><li>'려'</li></ol>
-</li>
-</ol>
-
+```
+1. '영혼''파트너''황의조''조규''성''이란''격파''선봉장''로'
+2. '국대''발탁''조규''성''황의조''내''우상''증명하겠'
+3. '메시''아버지''바르셀로나''메시''복귀''논''중'
+4. '활약상''의욕''충만''조규''성''이란''UAE''전''득점''노리겠'
+5. '국가대표''조규''성''박지수''권창훈''수사''불패''정신''임하겠'
+6. '보르도''대재앙''몽펠리에''황의조''영입''려'
+```
 
 
 
@@ -328,52 +271,14 @@ noun_list = extractNoun(title); head(noun_list)
 tail(noun_list)
 ```
 
-
-<ol>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'메시'</li><li>'네이마르'</li><li>'야유'</li><li>'PSG'</li><li>'DF'</li><li>'야유'</li><li>'이해'</li><li>'한'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'수원FC'</li><li>'박민규'</li><li>'벤투호'</li><li>'첫'</li><li>'발'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'손흥민'</li><li>'지원사'</li><li>'격'</li><li>'K'</li><li>'리거'</li><li>'들'</li><li>'맡겼'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'유럽파'</li><li>'황의조'</li><li>'vs'</li><li>'상승세'</li><li>'조규'</li><li>'성'</li><li>'국대'</li><li>'스트라이커'</li><li>'경쟁'</li><li>'파'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'벤투호'</li><li>'손흥민'</li><li>'황희'</li><li>'찬'</li><li>'등'</li><li>'해외파'</li><li>'호출'</li><li>'이란'</li><li>'전'</li><li>'최정예'</li><li>'명단'</li><li>'공'</li><li>'개'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'리그'</li><li>'G'</li><li>'골'</li><li>'폭발'</li><li>'벤투호'</li><li>'승선'</li><li>'조규'</li><li>'성'</li><li>'팀'</li><li>'짐'</li></ol>
-</li>
-</ol>
-
+```
+1. '메시''네이마르''야유''PSG''DF''야유''이해''한'
+2. '수원FC''박민규''벤투호''첫''발'
+3. '손흥민''지원사''격''K''리거''들''맡겼'
+4. '유럽파''황의조''vs''상승세''조규''성''국대''스트라이커''경쟁''파'
+5. '벤투호''손흥민''황희''찬''등''해외파''호출''이란''전''최정예''명단''공''개'
+6. '리그''G''골''폭발''벤투호''승선''조규''성''팀''짐'
+```
 
 
 
@@ -408,51 +313,14 @@ buildDictionary(ext_dic = c("NIADic", "woorimalsam", "insighter", "sejong"),
 noun_list = extractNoun(title); head(noun_list)
 ```
 
-
-<ol>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'영혼'</li><li>'파트너'</li><li>'황의조'</li><li>'조규성'</li><li>'이란'</li><li>'격파'</li><li>'선봉장'</li><li>'로'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'국대'</li><li>'발탁'</li><li>'조규성'</li><li>'황의조'</li><li>'내'</li><li>'우상'</li><li>'증명하겠'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'메시'</li><li>'아버지'</li><li>'바르셀로나'</li><li>'메시'</li><li>'복귀'</li><li>'논'</li><li>'중'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'활약상'</li><li>'의욕'</li><li>'충만'</li><li>'조규성'</li><li>'이란'</li><li>'UAE'</li><li>'전'</li><li>'득점'</li><li>'노리겠'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'국가대표'</li><li>'조규성'</li><li>'박지수'</li><li>'권창훈'</li><li>'수사'</li><li>'불패'</li><li>'정신'</li><li>'임하겠'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'보르도'</li><li>'대재앙'</li><li>'몽펠리에'</li><li>'황의조'</li><li>'영입'</li><li>'려'</li></ol>
-</li>
-</ol>
+```
+1. '영혼''파트너''황의조''조규성''이란''격파''선봉장''로'
+2. '국대''발탁''조규성''황의조''내''우상''증명하겠'
+3. '메시''아버지''바르셀로나''메시''복귀''논''중'
+4. '활약상''의욕''충만''조규성''이란''UAE''전''득점''노리겠'
+5. '국가대표''조규성''박지수''권창훈''수사''불패''정신''임하겠'
+6. '보르도''대재앙''몽펠리에''황의조''영입''려'
+```
 
 
 
@@ -461,53 +329,14 @@ noun_list = extractNoun(title); head(noun_list)
 tail(noun_list)
 ```
 
-
-<ol>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'메시'</li><li>'네이마르'</li><li>'야유'</li><li>'PSG'</li><li>'팬들'</li><li>'DF'</li><li>'야유'</li><li>'이해'</li><li>'한'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'수원FC'</li><li>'박민규'</li><li>'벤투호'</li><li>'첫'</li><li>'발'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'손흥민'</li><li>'지원사격'</li><li>'K'</li><li>'리거'</li><li>'들'</li><li>'맡겼'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'유럽파'</li><li>'황의조'</li><li>'vs'</li><li>'상승세'</li><li>'조규성'</li><li>'국대'</li><li>'스트라이커'</li><li>'경쟁'</li><li>'파'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'벤투호'</li><li>'손흥민'</li><li>'황희찬'</li><li>'등'</li><li>'해외파'</li><li>'호출'</li><li>'이란'</li><li>'전'</li><li>'최정예'</li><li>'명단'</li><li>'공'</li><li>'개'</li></ol>
-</li>
-	<li><style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'리그'</li><li>'G'</li><li>'골'</li><li>'폭발'</li><li>'벤투호'</li><li>'승선'</li><li>'조규성'</li><li>'팀'</li><li>'짐'</li></ol>
-</li>
-</ol>
-
-
+```
+1. '메시''네이마르''야유''PSG''팬들''DF''야유''이해''한'
+2. '수원FC''박민규''벤투호''첫''발'
+3. '손흥민''지원사격''K''리거''들''맡겼'
+4. '유럽파''황의조''vs''상승세''조규성''국대''스트라이커''경쟁''파'
+5. '벤투호''손흥민''황희찬''등''해외파''호출''이란''전''최정예''명단''공''개'
+6.'리그''G''골''폭발''벤투호''승선''조규성''팀''짐'
+```
 
 
 
@@ -519,9 +348,9 @@ tb_noun = table(unlist(noun_list))
 length(tb_noun)
 ```
 
-
+```
 366
-
+```
 
 
 ```R
@@ -555,7 +384,7 @@ df_noun <- df_noun[nchar(df_noun$Var1) > 1, ]
 ```
 
 
-```R
+```javascript
 library(dplyr)
 ```
 
@@ -600,7 +429,7 @@ df_noun <- df_noun %>% arrange(desc(df_noun$Freq))
 - 두 글자 이상인 것 들에 대해서만 시각화
 
 
-```R
+```javascript
 library(ggplot2)
 library(showtext)
 ```

@@ -1,6 +1,9 @@
 ## FIFA21 : 탐색적 데이터 분석 (EDA) & 시각화
 
+<img width="450" height="550" src="https://github.com/ChSSolee/R-study/blob/main/EDA%20%26%20Vis/FIFA21%20Pic.png">
+
 <br/>
+
 
 ### FIFA 21
 - FIFA 21은 축구를 소재로 한 비디오 게임으로 EA 스포츠의 FIFA 시리즈 28번째 정규작. (https://ko.wikipedia.org/wiki/FIFA_21)
@@ -290,8 +293,15 @@ ggplot(nation, aes(fct_reorder(country, count), count, image = image, fill = cou
 ![png](output_10_1.png)
     
 
+- 관찰 결과 FIFA 21의 데이터에서 가장 많은 선수의 국적은 잉글랜드이다. 이와 관련된 주요 이유 중 하나는 영국에서 대부분의 사용자 기반을 독점하고 있는 EA 프랜차이즈 때문이다. 또한 FIFA에서도 잉글랜드 리그가 가장 많은 수의 팀을 보유하고 있으며, 가장 많은 선수를 배출하고 있다.
 
-### Height Distribution of Countries
+
+<br/>
+
+<br/>
+
+### 신장(Height)과 몸무게(Weight) 산점도
+- 해당 데이터의 신장과 몸무게의 표현단위는 인치/피트(inch/feet) & 파운드(lbs)로 표현되어 있기에, 해당 열들을 Kg와 cm으로 변환 
 
 
 ```R
@@ -401,9 +411,13 @@ ggplot(fifa, aes(Height, Weight, size = Height, color = Height)) +
     
 ![png](output_14_1.png)
     
+<br/>
 
+<br/>
 
-### OVA Distribution of Countries
+### 국가별 OVA분포
+- OVA (Overall)는 선수의 종합 능력치를 의미
+- 데이터에서 가장 많은 선수를 보유한 상위 10개의 국가들에 대해 OVA의 분포를 시각화
 
 
 ```R
@@ -455,8 +469,11 @@ n1 ; n2
 ![png](output_16_2.png)
     
 
+<br/>
 
-### Left & Right
+<br/>
+
+### 왼발/오른발 분포
 
 
 ```R
@@ -486,9 +503,20 @@ ggplot(lar, aes(ymax = ymax, ymin = ymin, xmax = 5, xmin = 3.5, fill = foot)) +
     
 ![png](output_19_0.png)
     
+- 오른발잡이 선수들의 비율은 75.4%, 왼발잡이 선수들의 비율은 24.6%임을 알 수 있다.
 
 
-#### Positions Counts
+<br/>
+
+<br/>
+
+#### 포지션의 빈도
+- 선수들의 포지션은 총 15개로 구분
+- (ST : 스트라이커 / CF : 센터포워드 / LW : 레프트 윙 포워드 / RW : 라이트 윙 포워드)
+- (CAM : 중앙 공격형 미드필더 / CM : 중앙 미드필더 / CDM : 중앙 수비형 미드필더 / LM : 왼쪽 측면 미드필더 / RM : 우측 측면 미드필더)
+- (CB : 중앙 수비수 / RB : 우측 측면 수비수 / LB : 좌측 측면 수비수 / RWB : 우측 윙백 / LWB : 좌측 윙백)
+- (GK : 골키퍼)
+
 
 
 ```R
@@ -506,12 +534,17 @@ fifa %>% group_by(BP) %>% count()  %>%
 ```
 
 
+
     
 ![png](output_21_0.png)
     
+- 데이터에서 가장 많은 포지션은 센터백으로 스트라이커와 중앙 공격형 미드필더 포지션이 그 뒤를 잇는다.
 
+<br/>
 
-#### Age Distribution
+<br/>
+
+#### 연령 분포 시각화
 
 
 ```R
@@ -533,10 +566,10 @@ fifa %>% ggplot(aes(Age)) + stat_count(aes(fill = ..count..)) +
     
 ![png](output_23_0.png)
     
+- 연령의 분포는 좌측으로 기울어져 있으며, 20 ~ 24세의 선수들이 가장 높은 비율을 가짐
 
 
-#### Value & Age
-
+#### 선수가치(Value)와 급여(Wage) 분포 
 
 ```R
 head(fifa$Value)
@@ -661,9 +694,9 @@ ggplot(fifa, aes(Value_1, Wage_1, size = Wage_1, color = Value_1)) +
     
 ![png](output_29_0.png)
     
+<br/>
 
-
-### Top10 Value Players
+### 선수가치 Top 10
 
 
 ```R
@@ -690,9 +723,11 @@ top10_value %>% arrange(-Value_1) %>% head(10) %>%
     
 ![png](output_31_0.png)
     
+- 가장 가치가 높은 선수는 K.Mbappe(킬리앙 음바페)로, 그 가치는 105.5M 파운드(1700억원)이다.
 
+<br/>
 
-### Top10 Wage Players
+### 선수급여 Top 10
 
 
 ```R
@@ -719,10 +754,16 @@ top10_wage %>% arrange(-Wage_1) %>% head(10) %>%
 
     
 ![png](output_33_0.png)
-    
+
+- 가장 높은 급여를 가진 선수는 L.Messi(리오넬 메시)로, 주급은 56만 파운드(9억원)이다.
 
 
-#### Leagues
+<br/>
+
+<br/>
+
+### 유럽 5대리그
+#### 유럽 상위 5대리그 (잉글랜드 EPL, 스페인 Laliga, 독일 Bundes Liga, 이탈리아 Serie A, 프랑스 Ligue 1)에 속한 선수들의 특성 분포 시각화를 위한 데이터 Filtering
 
 
 ```R
@@ -783,7 +824,9 @@ dim(league_df)
 </style>
 <ol class=list-inline><li>3524</li><li>112</li></ol>
 
+<br/>
 
+### 유럽 5대리그의 리그별 OVA분포
 
 
 ```R
@@ -825,7 +868,11 @@ gridExtra::grid.arrange(a1, a2, nrow = 2)
     
 ![png](output_37_1.png)
     
+<br/>
 
+<br/>
+
+### 유럽 5대리그의 리그별 선수급여 분포
 
 
 ```R
@@ -872,7 +919,11 @@ gridExtra::grid.arrange(b1, b2, nrow = 2)
 ![png](output_38_1.png)
     
 
+<br/>
 
+<br/>
+
+### 유럽 5대리그의 리그별 선수급여 분포
 
 ```R
 c1 <- league_df %>% group_by(League) %>% select(League, Value_1) %>%
@@ -915,9 +966,21 @@ gridExtra::grid.arrange(c1, c2, nrow = 2)
     
 ![png](output_39_1.png)
     
+<br/>
 
+<br/>
 
-### EPL
+### 각 리그별 Best 11 선정
+- ST, CF, LW, LM, RW, RW 포지션을 공격진 (FW_LW_RW)으로 라벨링
+- CM, CAM, CDM 포지션을 미드필더 (MF)로 라벨링
+- LB, LWB를 좌측 측면 수비수 (LB)로 라벨링
+- RB, RWB를 우측 측면 수비수 (RB)로 라벨링
+- CB와 GK는 각각 중앙 수비수 (CB)와 골키퍼 (GK)로 라벨링
+- 이후 포지션별 가장 OVA를 가진 선수들로 Best 11을 선정
+
+<br/>
+
+### EPL Best 11
 
 
 ```R
@@ -972,11 +1035,11 @@ rbind(epl_fw, epl_mf) %>% rbind(epl_lb) %>% rbind(epl_cb) %>% rbind(epl_rb) %>% 
 	<tr><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
-	<tr><td>S. Man?            </td><td>Senegal    </td><td>Liverpool      </td><td>90</td><td>LW </td><td>28</td></tr>
+	<tr><td>S. Mane            </td><td>Senegal    </td><td>Liverpool      </td><td>90</td><td>LW </td><td>28</td></tr>
 	<tr><td>M. Salah           </td><td>Egypt      </td><td>Liverpool      </td><td>90</td><td>RW </td><td>28</td></tr>
-	<tr><td>S. Ag?ero          </td><td>Argentina  </td><td>Manchester City</td><td>89</td><td>ST </td><td>32</td></tr>
+	<tr><td>S. Aguero          </td><td>Argentina  </td><td>Manchester City</td><td>89</td><td>ST </td><td>32</td></tr>
 	<tr><td>K. De Bruyne       </td><td>Belgium    </td><td>Manchester City</td><td>91</td><td>CAM</td><td>29</td></tr>
-	<tr><td>N. Kant?           </td><td>France     </td><td>Chelsea        </td><td>88</td><td>CDM</td><td>29</td></tr>
+	<tr><td>N. Kante           </td><td>France     </td><td>Chelsea        </td><td>88</td><td>CDM</td><td>29</td></tr>
 	<tr><td>Fabinho            </td><td>Brazil     </td><td>Liverpool      </td><td>87</td><td>CDM</td><td>26</td></tr>
 	<tr><td>A. Robertson       </td><td>Scotland   </td><td>Liverpool      </td><td>87</td><td>LB </td><td>26</td></tr>
 	<tr><td>V. van Dijk        </td><td>Netherlands</td><td>Liverpool      </td><td>90</td><td>CB </td><td>28</td></tr>
@@ -986,7 +1049,9 @@ rbind(epl_fw, epl_mf) %>% rbind(epl_lb) %>% rbind(epl_cb) %>% rbind(epl_rb) %>% 
 </tbody>
 </table>
 
+![png](epl.png)
 
+<br/>
 
 ### LALIGA
 
@@ -1024,16 +1089,19 @@ rbind(llg_fw, llg_mf) %>% rbind(llg_lb) %>% rbind(llg_cb) %>% rbind(llg_rb) %>% 
 	<tr><td>E. Hazard   </td><td>Belgium  </td><td>Real Madrid    </td><td>88</td><td>LW </td><td>29</td></tr>
 	<tr><td>Casemiro    </td><td>Brazil   </td><td>Real Madrid    </td><td>89</td><td>CDM</td><td>28</td></tr>
 	<tr><td>T. Kroos    </td><td>Germany  </td><td>Real Madrid    </td><td>88</td><td>CM </td><td>30</td></tr>
-	<tr><td>L. Modri?   </td><td>Croatia  </td><td>Real Madrid    </td><td>87</td><td>CM </td><td>34</td></tr>
+	<tr><td>L. Modric   </td><td>Croatia  </td><td>Real Madrid    </td><td>87</td><td>CM </td><td>34</td></tr>
 	<tr><td>Jordi Alba  </td><td>Spain    </td><td>FC Barcelona   </td><td>86</td><td>LB </td><td>31</td></tr>
 	<tr><td>Sergio Ramos</td><td>Spain    </td><td>Real Madrid    </td><td>89</td><td>CB </td><td>34</td></tr>
-	<tr><td>Piqu?       </td><td>Spain    </td><td>FC Barcelona   </td><td>86</td><td>CB </td><td>33</td></tr>
+	<tr><td>Pique       </td><td>Spain    </td><td>FC Barcelona   </td><td>86</td><td>CB </td><td>33</td></tr>
 	<tr><td>Carvajal    </td><td>Spain    </td><td>Real Madrid    </td><td>86</td><td>RB </td><td>28</td></tr>
 	<tr><td>J. Oblak    </td><td>Slovenia </td><td>Atletico Madrid</td><td>91</td><td>GK </td><td>27</td></tr>
 </tbody>
 </table>
 
 
+![png](laliga.png)
+
+<br/>
 
 ### BUNDES
 
@@ -1066,21 +1134,23 @@ rbind(bun_fw, bun_mf) %>% rbind(bun_lb) %>% rbind(bun_cb) %>% rbind(bun_rb[2,]) 
 	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
-	<tr><th scope=row>1</th><td>R. Lewandowski</td><td>Poland </td><td>FC Bayern M?nchen  </td><td>91</td><td>ST </td><td>31</td></tr>
-	<tr><th scope=row>2</th><td>S. Gnabry     </td><td>Germany</td><td>FC Bayern M?nchen  </td><td>85</td><td>RM </td><td>24</td></tr>
-	<tr><th scope=row>3</th><td>L. San?       </td><td>Germany</td><td>FC Bayern M?nchen  </td><td>85</td><td>LM </td><td>24</td></tr>
-	<tr><th scope=row>4</th><td>J. Kimmich    </td><td>Germany</td><td>FC Bayern M?nchen  </td><td>88</td><td>CDM</td><td>25</td></tr>
+	<tr><th scope=row>1</th><td>R. Lewandowski</td><td>Poland </td><td>FC Bayern Munchen  </td><td>91</td><td>ST </td><td>31</td></tr>
+	<tr><th scope=row>2</th><td>S. Gnabry     </td><td>Germany</td><td>FC Bayern Munchen  </td><td>85</td><td>RM </td><td>24</td></tr>
+	<tr><th scope=row>3</th><td>L. Sane       </td><td>Germany</td><td>FC Bayern Munchen  </td><td>85</td><td>LM </td><td>24</td></tr>
+	<tr><th scope=row>4</th><td>J. Kimmich    </td><td>Germany</td><td>FC Bayern Munchen  </td><td>88</td><td>CDM</td><td>25</td></tr>
 	<tr><th scope=row>5</th><td>J. Sancho     </td><td>England</td><td>Borussia Dortmund  </td><td>87</td><td>CAM</td><td>20</td></tr>
-	<tr><th scope=row>6</th><td>T. M?ller     </td><td>Germany</td><td>FC Bayern M?nchen  </td><td>86</td><td>CAM</td><td>30</td></tr>
+	<tr><th scope=row>6</th><td>T. Muller     </td><td>Germany</td><td>FC Bayern Munchen  </td><td>86</td><td>CAM</td><td>30</td></tr>
 	<tr><th scope=row>7</th><td>M. Halstenberg</td><td>Germany</td><td>RB Leipzig         </td><td>82</td><td>LB </td><td>28</td></tr>
 	<tr><th scope=row>8</th><td>M. Hummels    </td><td>Germany</td><td>Borussia Dortmund  </td><td>86</td><td>CB </td><td>31</td></tr>
-	<tr><th scope=row>9</th><td>D. Alaba      </td><td>Austria</td><td>FC Bayern M?nchen  </td><td>84</td><td>CB </td><td>28</td></tr>
+	<tr><th scope=row>9</th><td>D. Alaba      </td><td>Austria</td><td>FC Bayern Munchen  </td><td>84</td><td>CB </td><td>28</td></tr>
 	<tr><th scope=row>21</th><td>L. Bender     </td><td>Germany</td><td>Bayer 04 Leverkusen</td><td>82</td><td>RB </td><td>31</td></tr>
-	<tr><th scope=row>11</th><td>M. Neuer      </td><td>Germany</td><td>FC Bayern M?nchen  </td><td>89</td><td>GK </td><td>34</td></tr>
+	<tr><th scope=row>11</th><td>M. Neuer      </td><td>Germany</td><td>FC Bayern Munchen  </td><td>89</td><td>GK </td><td>34</td></tr>
 </tbody>
 </table>
 
+![png](bundes.png)
 
+<br/>
 
 ### Serie
 
@@ -1117,17 +1187,19 @@ rbind(ser_fw, ser_mf) %>% rbind(ser_lb) %>% rbind(ser_cb) %>% rbind(ser_rb) %>% 
 	<tr><td>C. Immobile      </td><td>Italy    </td><td>Lazio   </td><td>87</td><td>ST </td><td>30</td></tr>
 	<tr><td>D. Mertens       </td><td>Belgium  </td><td>Napoli  </td><td>85</td><td>CF </td><td>33</td></tr>
 	<tr><td>P. Dybala        </td><td>Argentina</td><td>Juventus</td><td>88</td><td>CAM</td><td>26</td></tr>
-	<tr><td>A. G?mez         </td><td>Argentina</td><td>Atalanta</td><td>86</td><td>CAM</td><td>32</td></tr>
+	<tr><td>A. Gomez         </td><td>Argentina</td><td>Atalanta</td><td>86</td><td>CAM</td><td>32</td></tr>
 	<tr><td>C. Eriksen       </td><td>Denmark  </td><td>Inter   </td><td>85</td><td>CAM</td><td>28</td></tr>
 	<tr><td>Alex Sandro      </td><td>Brazil   </td><td>Juventus</td><td>85</td><td>LB </td><td>29</td></tr>
 	<tr><td>K. Koulibaly     </td><td>Senegal  </td><td>Napoli  </td><td>88</td><td>CB </td><td>29</td></tr>
 	<tr><td>G. Chiellini     </td><td>Italy    </td><td>Juventus</td><td>87</td><td>CB </td><td>35</td></tr>
 	<tr><td>Danilo           </td><td>Brazil   </td><td>Juventus</td><td>79</td><td>RB </td><td>28</td></tr>
-	<tr><td>S. Handanovi?    </td><td>Slovenia </td><td>Inter   </td><td>88</td><td>GK </td><td>35</td></tr>
+	<tr><td>S. Handanovic    </td><td>Slovenia </td><td>Inter   </td><td>88</td><td>GK </td><td>35</td></tr>
 </tbody>
 </table>
 
+![png](serie.png)
 
+<br/>
 
 ### LIGUE1
 
@@ -1161,7 +1233,7 @@ rbind(lig_fw, lig_mf) %>% rbind(lig_lb) %>% rbind(lig_cb) %>% rbind(lig_rb) %>% 
 </thead>
 <tbody>
 	<tr><td>Neymar Jr  </td><td>Brazil     </td><td>Paris Saint-Germain</td><td>91</td><td>LW </td><td>28</td></tr>
-	<tr><td>K. Mbapp?  </td><td>France     </td><td>Paris Saint-Germain</td><td>90</td><td>ST </td><td>21</td></tr>
+	<tr><td>K. Mbappe  </td><td>France     </td><td>Paris Saint-Germain</td><td>90</td><td>ST </td><td>21</td></tr>
 	<tr><td>A. Di Mar?a</td><td>Argentina  </td><td>Paris Saint-Germain</td><td>87</td><td>RW </td><td>32</td></tr>
 	<tr><td>M. Verratti</td><td>Italy      </td><td>Paris Saint-Germain</td><td>86</td><td>CM </td><td>27</td></tr>
 	<tr><td>M. Depay   </td><td>Netherlands</td><td>Olympique Lyonnais </td><td>85</td><td>CAM</td><td>26</td></tr>
@@ -1174,9 +1246,11 @@ rbind(lig_fw, lig_mf) %>% rbind(lig_lb) %>% rbind(lig_cb) %>% rbind(lig_rb) %>% 
 </tbody>
 </table>
 
+![png](ligue1.png)
 
+<br/>
 
-### TOTAL
+### 통합 Best 11
 
 
 ```R
@@ -1209,7 +1283,7 @@ rbind(tot_fw, tot_mf) %>% rbind(tot_lb) %>% rbind(tot_cb) %>% rbind(tot_rb[2,]) 
 <tbody>
 	<tr><th scope=row>1</th><td>L. Messi           </td><td>Argentina  </td><td>FC Barcelona     </td><td>93</td><td>RW </td><td>33</td></tr>
 	<tr><th scope=row>2</th><td>Cristiano Ronaldo  </td><td>Portugal   </td><td>Juventus         </td><td>92</td><td>ST </td><td>35</td></tr>
-	<tr><th scope=row>3</th><td>R. Lewandowski     </td><td>Poland     </td><td>FC Bayern M?nchen</td><td>91</td><td>ST </td><td>31</td></tr>
+	<tr><th scope=row>3</th><td>R. Lewandowski     </td><td>Poland     </td><td>FC Bayern Munchen</td><td>91</td><td>ST </td><td>31</td></tr>
 	<tr><th scope=row>4</th><td>K. De Bruyne       </td><td>Belgium    </td><td>Manchester City  </td><td>91</td><td>CAM</td><td>29</td></tr>
 	<tr><th scope=row>5</th><td>Casemiro           </td><td>Brazil     </td><td>Real Madrid      </td><td>89</td><td>CDM</td><td>28</td></tr>
 	<tr><th scope=row>6</th><td>T. Kroos           </td><td>Germany    </td><td>Real Madrid      </td><td>88</td><td>CM </td><td>30</td></tr>
@@ -1221,9 +1295,13 @@ rbind(tot_fw, tot_mf) %>% rbind(tot_lb) %>% rbind(tot_cb) %>% rbind(tot_rb[2,]) 
 </tbody>
 </table>
 
+![png](total.png)
 
 
-### Rookies
+<br/>
+
+### 가장 높은 잠재력(POT)를 가진 영 플레이어 Top 10
+- 23세 이하의 연령의 선수들중 가장 높은 잠재력 (POT)를 가진 선수들 Top 10을 선정
 
 
 ```R
@@ -1239,16 +1317,16 @@ rbind(tot_fw, tot_mf) %>% rbind(tot_lb) %>% rbind(tot_cb) %>% rbind(tot_rb[2,]) 
 	<tr><th></th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;int&gt;</th></tr>
 </thead>
 <tbody>
-	<tr><th scope=row>1</th><td>K. Mbapp?          </td><td>France     </td><td>Paris Saint-Germain</td><td>95</td><td>ST </td><td>21</td></tr>
+	<tr><th scope=row>1</th><td>K. Mbappe          </td><td>France     </td><td>Paris Saint-Germain</td><td>95</td><td>ST </td><td>21</td></tr>
 	<tr><th scope=row>2</th><td>J. Sancho          </td><td>England    </td><td>Borussia Dortmund  </td><td>93</td><td>CAM</td><td>20</td></tr>
 	<tr><th scope=row>3</th><td>K. Havertz         </td><td>Germany    </td><td>Chelsea            </td><td>93</td><td>CAM</td><td>21</td></tr>
-	<tr><th scope=row>4</th><td>Vin?cius Jr.       </td><td>Brazil     </td><td>Real Madrid        </td><td>93</td><td>RM </td><td>19</td></tr>
-	<tr><th scope=row>5</th><td>Jo?o F?lix         </td><td>Portugal   </td><td>Atletico Madrid    </td><td>93</td><td>CAM</td><td>20</td></tr>
+	<tr><th scope=row>4</th><td>Vinicius Jr.       </td><td>Brazil     </td><td>Real Madrid        </td><td>93</td><td>RM </td><td>19</td></tr>
+	<tr><th scope=row>5</th><td>Jo?o Felix         </td><td>Portugal   </td><td>Atletico Madrid    </td><td>93</td><td>CAM</td><td>20</td></tr>
 	<tr><th scope=row>6</th><td>G. Donnarumma      </td><td>Italy      </td><td>Milan              </td><td>92</td><td>GK </td><td>21</td></tr>
 	<tr><th scope=row>7</th><td>T. Alexander-Arnold</td><td>England    </td><td>Liverpool          </td><td>92</td><td>RB </td><td>21</td></tr>
 	<tr><th scope=row>8</th><td>M. de Ligt         </td><td>Netherlands</td><td>Juventus           </td><td>92</td><td>CB </td><td>20</td></tr>
 	<tr><th scope=row>9</th><td>E. Haaland         </td><td>Norway     </td><td>Borussia Dortmund  </td><td>92</td><td>ST </td><td>19</td></tr>
-	<tr><th scope=row>10</th><td>L. Mart?nez        </td><td>Argentina  </td><td>Inter              </td><td>91</td><td>ST </td><td>22</td></tr>
+	<tr><th scope=row>10</th><td>L. Martinez        </td><td>Argentina  </td><td>Inter              </td><td>91</td><td>ST </td><td>22</td></tr>
 </tbody>
 </table>
 

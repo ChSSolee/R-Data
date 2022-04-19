@@ -439,15 +439,20 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster1),
 
 
 
-
+- 군집1에 속하는 선수들 포지션의 47%가 CAM(중앙 공격형 미드필더), CM(중앙 미드필더), CDM(중앙 수비형 미드필더)로써 미드필더 포지션을 가진 선수들이 높은 비율을 차지한다.
+- 하지만 군집1에 속한 선수들의 포지션 비율차는 크지 않다
+- 군집에 속한 선수들의 평균 능력치는 아래의 Starplot과 같다.
 
 
 
     
 ![png](output_28_2.png)
     
+- 군집1에 속하는 선수들의 능력치는 Goalkeeping을 제외한 모든 능력치가 높음을 알 수 있으며, 오른발 잡이의 비율이 80%임을 알 수 있다. 
 
+<br/>
 
+### 군집 2
 
 ```R
 league_df %>%
@@ -482,14 +487,20 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster2),
 
 
 
+- 군집2에 속하는 선수들의 포지션은 전부 골키퍼임을 알 수있다.
+- 군집2에 속한 선수들의 평균 능력치는 아래의 Starplot과 같다.
 
 
 
     
 ![png](output_29_2.png)
     
+- 군집2에 속하는 선수들의 포지션은 전부 골키퍼이기에, 군집1에 속하는 선수들은 Goalkeeping 능력치에서 높음을 알 수 있다.
 
 
+<br/>
+
+### 군집 3
 
 ```R
 league_df %>%
@@ -522,6 +533,8 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster3),
 
 
 
+- 군집3에 속하는 선수들의 포지션중 가장 높은 비율을 가진 포지션은 ST(스트라이커)와 CAM(중앙 공격형 미드필더)로써, 공격적인 역할의 포지션이 높은 비율을 차지함을 알 수 있다.
+- 군집3에 속한 선수들의 평균 능력치는 아래의 Starplot과 같다.
 
 
 
@@ -534,7 +547,7 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster3),
 
 ```R
 league_df %>%
-    filter(Cluster == 1) %>%
+    filter(Cluster == 4) %>%
     group_by(BP) %>% count() %>% 
     mutate(ratio = n / sum(.[,2])) %>% 
     ggplot(aes(fct_reorder(BP, -ratio), ratio, fill = n)) + geom_col() + 
@@ -562,7 +575,7 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster4),
 ![png](output_31_0.png)
     
 
-
+- 군집4에 속하는 선수들의 68.1%는 CB(중앙 수비수)임을 알 수 있다.
 
 
 

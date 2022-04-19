@@ -317,7 +317,8 @@ fviz_cluster(k4, data = league_df_c) + theme_bw()
 ![png](output_24_0.png)
     
 
-#### 산점도의 X축은 차원축소에 
+#### 산점도는 주성분분석(PCA)에 의해 생성된 성분간의 관계를 표현한 것이다
+#### X축의 Dim1은 전체분산의 51.9%를 설명하는 주성분이며, Y축의 Dim2는 전체분산의 14.8%를 설명하는 주성분이다.
 
 ```R
 pca <- PCA(league_df_c, graph = FALSE)
@@ -330,14 +331,19 @@ fviz_contrib(pca, choice = "var", axes = 2, top = 5) + theme_bw()
 ![png](output_25_0.png)
     
 
+#### Dim1을 구성하고 있는 요인(facor)중 높은 기여도를 가진 상위 5개의 요인은 각각 Ball.Control, Dribbling, Short.Passing, Crossing, Positioning이다. 
 
 
     
 ![png](output_25_1.png)
     
+#### Dim2를 구성하고 있는 요인중 높은 기여도를 가진 상위 5개의 요인은 각각 Sliding.Tackle, Standing.Tackle, Interceptions, Marking, Strength이다.
 
+<br/>
 
-### Cluster 1
+<br/>
+
+### 군집내 데이터 확인
 
 
 ```R
@@ -375,6 +381,9 @@ Cluster4 <- league_df %>%
     summarise_all(mean)
 ```
 
+<br/>
+
+### 군집 1
 
 ```R
 league_df %>%
@@ -404,7 +413,8 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster1),
 ![png](output_29_0.png)
     
 
-
+- 군집1에 속하는 선수들의 포지션은 전부 골키퍼임을 알 수있다.
+- 군집에 속한 선수들의 평균 능력치는 아래의 Starplot과 같다.
 
 
 
@@ -413,8 +423,11 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster1),
     
 ![png](output_29_2.png)
     
+- 군집1에 속하는 선수들의 포지션은 전부 골키퍼이기에, 군집1에 속하는 선수들은 Goalkeeping 능력치에서 높음을 알 수 있다.
 
+<br/>
 
+### 군집 2
 
 ```R
 league_df %>%
@@ -445,7 +458,8 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster2),
     
 
 
-
+- 군집2에 속하는 선수들의 포지션의 높은 비율이 CB(중앙 수비수)임을 알 수있으며, RB(우측 측면 수비수), CDM(중앙 수비형 미드필더), LB(좌측 측면 수비수)가 뒤를 따른다.
+- 군집에 속한 선수들의 평균 능력치는 아래의 Starplot과 같다.
 
 
 
@@ -453,8 +467,10 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster2),
     
 ![png](output_30_2.png)
     
+- 군집2에 속하는 선수들의 대부분이 수비적 역할의 포지션이기에, Defending(수비력)의 지표에서 높은 모습을 보임을 알 수 있다.
 
 
+<
 
 ```R
 league_df %>%

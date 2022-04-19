@@ -578,7 +578,7 @@ radarchart(bind_rows(rbind(posit_abil_max, rep(0, 10)), Cluster4),
     
 
 - 군집4에 속하는 선수들의 68.1%는 CB(중앙 수비수)임을 알 수 있다.
-
+- 군집4에 속하는 선수들의 평균 능력치는 Defending(수비력)이 높음을 알 수 있다.
 
 
 

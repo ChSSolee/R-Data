@@ -12,64 +12,7 @@ library(readxl)
 ggplot2::theme_set(theme_bw())
 ```
 
-    Loading required package: magrittr
-    
-    
-    Attaching package: ‘imager’
-    
-    
-    The following object is masked from ‘package:magrittr’:
-    
-        add
-    
-    
-    The following objects are masked from ‘package:stats’:
-    
-        convolve, spectrum
-    
-    
-    The following object is masked from ‘package:graphics’:
-    
-        frame
-    
-    
-    The following object is masked from ‘package:base’:
-    
-        save.image
-    
-    
-    
-    Attaching package: ‘EBImage’
-    
-    
-    The following objects are masked from ‘package:imager’:
-    
-        channel, dilate, display, erode, resize, watershed
-    
-    
-    The following objects are masked from ‘package:OpenImageR’:
-    
-        readImage, writeImage
-    
-    
-    ── [1mAttaching packages[22m ─────────────────────────────────────── tidyverse 1.3.1 ──
-    
-    [32m✔[39m [34mggplot2[39m 3.3.5     [32m✔[39m [34mpurrr  [39m 0.3.4
-    [32m✔[39m [34mtibble [39m 3.1.6     [32m✔[39m [34mdplyr  [39m 1.0.8
-    [32m✔[39m [34mtidyr  [39m 1.2.0     [32m✔[39m [34mstringr[39m 1.4.0
-    [32m✔[39m [34mreadr  [39m 2.1.2     [32m✔[39m [34mforcats[39m 0.5.1
-    
-    ── [1mConflicts[22m ────────────────────────────────────────── tidyverse_conflicts() ──
-    [31m✖[39m [34mimager[39m::[32madd()[39m       masks [34mmagrittr[39m::add()
-    [31m✖[39m [34mstringr[39m::[32mboundary()[39m masks [34mimager[39m::boundary()
-    [31m✖[39m [34mdplyr[39m::[32mcombine()[39m    masks [34mEBImage[39m::combine()
-    [31m✖[39m [34mtidyr[39m::[32mextract()[39m    masks [34mmagrittr[39m::extract()
-    [31m✖[39m [34mtidyr[39m::[32mfill()[39m       masks [34mimager[39m::fill()
-    [31m✖[39m [34mdplyr[39m::[32mfilter()[39m     masks [34mstats[39m::filter()
-    [31m✖[39m [34mdplyr[39m::[32mlag()[39m        masks [34mstats[39m::lag()
-    [31m✖[39m [34mpurrr[39m::[32mset_names()[39m  masks [34mmagrittr[39m::set_names()
-    [31m✖[39m [34mpurrr[39m::[32mtranspose()[39m  masks [34mEBImage[39m::transpose()
-    
+<br/>    
     
 
 ## 데이터 로드

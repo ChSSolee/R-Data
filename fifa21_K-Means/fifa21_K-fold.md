@@ -1,3 +1,17 @@
+## 선수의 능력치에 따른 K-평균 군집화
+
+<br/>
+
+### K-평균 군집분석
+- 비계층적 군집분석
+- 주어진 데이터를 K개의 군집으로 묶는 알고리즘, 각 군집과 거리 차이의 분산을 최소화 하는 방식으로 동작
+>> 원하는 군집의 개수가 초기 값(seed)들을 정해 seed중심으로 군집을 형성
+>> 각 데이터를 거리가 가장 가까운 seed가 있는 군집으로 분류
+>> 각 군집의 seed값을 다시 계산
+>> 모든 개체가 군집으로 할당될 떄까지 
+
+<br/>
+
 ```R
 library(tidyverse)
 library(NbClust)
@@ -8,28 +22,26 @@ library(FactoMineR)
 ggplot2::theme_set(theme_classic())
 ```
 
+<br/>
 
+### 데이터 로드
+- 앞서 저장한 5대리그 데이터 로드
 ```R
 league_df <- read.csv("C:/league_df.csv", stringsAsFactors = TRUE)
 ```
+<br/>
 
+#### 데이터에는 107개의 변수가 있으나, 모든 변수를 군집분석에 사용하지 않고 선수들의 능력치, 사용 발 여부(좌/우)와 관련된 변수들을 통해 K-평균 군집분석 실시
 
-```R
-colnames(league_df)
-```
+<br/>
 
+### 군집분석을 하기 위한 변수 및 데이터 정제
 
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'ID'</li><li>'Name'</li><li>'Age'</li><li>'OVA'</li><li>'Nationality'</li><li>'Club'</li><li>'BOV'</li><li>'BP'</li><li>'Position'</li><li>'Player.Photo'</li><li>'Club.Logo'</li><li>'Flag.Photo'</li><li>'POT'</li><li>'X111648'</li><li>'feet'</li><li>'inches'</li><li>'Weight'</li><li>'foot'</li><li>'Growth'</li><li>'Joined'</li><li>'Loan.Date.End'</li><li>'Value'</li><li>'Wage'</li><li>'Release.Clause'</li><li>'Contract'</li><li>'Attacking'</li><li>'Crossing'</li><li>'Finishing'</li><li>'Heading.Accuracy'</li><li>'Short.Passing'</li><li>'Volleys'</li><li>'Skill'</li><li>'Dribbling'</li><li>'Curve'</li><li>'FK.Accuracy'</li><li>'Long.Passing'</li><li>'Ball.Control'</li><li>'Movement'</li><li>'Acceleration'</li><li>'Sprint.Speed'</li><li>'Agility'</li><li>'Reactions'</li><li>'Balance'</li><li>'Power'</li><li>'Shot.Power'</li><li>'Jumping'</li><li>'Stamina'</li><li>'Strength'</li><li>'Long.Shots'</li><li>'Mentality'</li><li>'Aggression'</li><li>'Interceptions'</li><li>'Positioning'</li><li>'Vision'</li><li>'Penalties'</li><li>'Composure'</li><li>'Defending'</li><li>'Marking'</li><li>'Standing.Tackle'</li><li>'Sliding.Tackle'</li><li>'Goalkeeping'</li><li>'GK.Diving'</li><li>'GK.Handling'</li><li>'GK.Kicking'</li><li>'GK.Positioning'</li><li>'GK.Reflexes'</li><li>'Total.Stats'</li><li>'Base.Stats'</li><li>'W.F'</li><li>'SM'</li><li>'A.W'</li><li>'D.W'</li><li>'IR'</li><li>'PAC'</li><li>'SHO'</li><li>'PAS'</li><li>'DRI'</li><li>'DEF'</li><li>'PHY'</li><li>'Hits'</li><li>'LS'</li><li>'ST'</li><li>'RS'</li><li>'LW'</li><li>'LF'</li><li>'CF'</li><li>'RF'</li><li>'RW'</li><li>'LAM'</li><li>'CAM'</li><li>'RAM'</li><li>'LM'</li><li>'LCM'</li><li>'CM'</li><li>'RCM'</li><li>'RM'</li><li>'LWB'</li><li>'LDM'</li><li>'CDM'</li><li>'RDM'</li><li>'RWB'</li><li>'LB'</li><li>'LCB'</li><li>'CB'</li><li>'RCB'</li><li>'RB'</li><li>'GK'</li><li>'Gender'</li><li>'Height'</li><li>'Value_1'</li><li>'Wage_1'</li><li>'League'</li><li>'BP2'</li></ol>
-
-
+<br/>
 
 ### Attacking Stats
-
+- 선수의 공격력을 나타내는 Attacking변수는 Crossing(크로스), Finishing(골 결졍력), Heading.Accuracy(헤딩 정확도), Short.Passing(짧은 패스), Volleys(발리)의 총합인 파생변수.
+- 따라서 군집분석을 위한 데이터에서 Attacking변수를 제외
 
 ```R
 league_df[, 26:31] %>% head
@@ -52,10 +64,11 @@ league_df[, 26:31] %>% head
 </tbody>
 </table>
 
-
+<br/>
 
 ### Skill Stats
-
+- 선수의 기술을 나타내는 Skill변수는 Dribbling(드리블), Curve(커브), FK.Accuracy(프리킥 정확도), Long.Passing(긴 패스), Ball.Control(볼 관리)의 총합인 파생변수.
+- 따라서 군집분석을 위한 데이터에서 Skill변수를 제외
 
 ```R
 league_df[, 32:37] %>% head
@@ -78,10 +91,11 @@ league_df[, 32:37] %>% head
 </tbody>
 </table>
 
-
+<br/>
 
 ### Movement Stats
-
+- 선수의 움직임을 나타내는 Movement변수는 Acceleration(가속), Sprint.Speed(주력), Agility(민첩성), Reactions(반응속도), Balance(균형)의 총합인 파생변수.
+- 따라서 군집분석을 위한 데이터에서 Movement변수를 제외
 
 ```R
 league_df[, 38:43] %>% head
@@ -104,10 +118,11 @@ league_df[, 38:43] %>% head
 </tbody>
 </table>
 
-
+<br/>
 
 ### Power Stats
-
+- 선수의 힘을 나타내는 Power변수는 Shot.Power(슛 파워), Jumping(점프), Stamina(체력), Long.Shots(중거리 슛)의 총합인 파생변수.
+- 따라서 군집분석을 위한 데이터에서 Power변수를 제외
 
 ```R
 league_df[, 44:49] %>% head
@@ -130,10 +145,11 @@ league_df[, 44:49] %>% head
 </tbody>
 </table>
 
-
+<br/>
 
 ### Mentality Stats
-
+- 선수의 정신력을 나타내는 Mentality변수는 Aggression(공격성), Interceptions(패스 차단 능력), Positioning(위치선정), Vision(시야), Penalties(페널티 킥), Composure(침착성)의 총합인 파생변수.
+- 따라서 군집분석을 위한 데이터에서 Mentality변수를 제외
 
 ```R
 league_df[, 50:56] %>% head
@@ -156,10 +172,11 @@ league_df[, 50:56] %>% head
 </tbody>
 </table>
 
-
+<br/>
 
 ### Defending Stats
-
+- 선수의 수비력을 나타내는 Defending변수는 Marking(맨 마킹 능력), Standing.Tackle(스탠딩 태클), Sliding.Tackle(슬라이딩 태클)의 총합인 파생변수.
+- 따라서 군집분석을 위한 데이터에서 Defending변수를 제외
 
 ```R
 league_df[, 57:60] %>% head
@@ -182,10 +199,11 @@ league_df[, 57:60] %>% head
 </tbody>
 </table>
 
-
+<br/>
 
 ### Goalkeeping Stats
-
+- 선수의 골키퍼 능력을 나타내는 Goalkeeping변수는 GK.Diving(골키퍼 다이빙), GK.Handling(골키퍼 볼 핸들링), GK.Kicking(골키퍼 킥), GK.Positioning(골키퍼 위치선정), GK.Reflexes(골키퍼 민첩성)의 총합인 파생변수.
+- 따라서 군집분석을 위한 데이터에서 Goalkeeping변수를 제외
 
 ```R
 league_df[, 61:66] %>% head
@@ -208,7 +226,7 @@ league_df[, 61:66] %>% head
 </tbody>
 </table>
 
-
+<br/>
 
 ### Foot
 
@@ -226,9 +244,11 @@ head(league_df$foot)
 </style>
 <ol class=list-inline><li>0</li><li>0</li><li>1</li><li>1</li><li>1</li><li>1</li></ol>
 
-
+<br/>
 
 ### Data for K-Means Cluster
+- 능력치, 사용 발, 신장과 몸무게에 대한 변수들을 군집분석을 위한 변수로 선정
+- K-평균 군집 분석은 관측치 간의 거리를 이용하기 때문에 변수의 단위가 결과에 큰 영향을 미침. 따라서 변수를 표준화를 적용
 
 
 ```R
@@ -253,10 +273,16 @@ head(league_df_c)
 </tbody>
 </table>
 
+<br/>
+
+### 최적의 군집수 탐색
+- K-평균 군집분석은 비지도학습 방법으로써, 생성할 군집의 개수 K를 사전에 설정할 수 있다.
+- 최적의 군집형성의 기준은 **군집간 이질, 군집내 동질**
 
 
 ### K-Means Clustering with Elbow
-
+- 군집의 집단 내 제곱합 그래프는 얼마나 군집화가 잘되었는가를 알려주는 척도로 군집내 총 제곱합(WSS, Total Within Sum of Squares)를 최소화 하는 것을 목적으로 한다.
+- 군집 수에 따른 군집 내 총 제곱합의 그래프를 그려 최적의 군집수 선정, **급격히 감소하는 지점까지 군집으로 설정**하여 최적의 군집 개수 결정 
 
 ```R
 fviz_nbclust(league_df_c, kmeans, k.max = 15, method = "wss")
@@ -273,7 +299,12 @@ fviz_nbclust(league_df_c, kmeans, k.max = 15, method = "wss")
 
 
 ### Elbow Point = 4
+- 4까지 WSS가 급격히 감소하나, 그 이후 감소의 폭이 완만해짐 => 군집수를 4로 결정
 
+
+<br/>
+
+### K = 4의 군집분석 실시 및 시각화
 
 ```R
 k4 <- kmeans(league_df_c, 4)
@@ -286,7 +317,7 @@ fviz_cluster(k4, data = league_df_c) + theme_bw()
 ![png](output_24_0.png)
     
 
-
+#### 산점도의 X축은 차원축소에 
 
 ```R
 pca <- PCA(league_df_c, graph = FALSE)

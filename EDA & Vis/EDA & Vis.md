@@ -1,3 +1,16 @@
+## FIFA21 : 탐색적 데이터 분석 (EDA) & 시각화
+
+<br/>
+
+### FIFA 21
+- FIFA 21은 축구를 소재로 한 비디오 게임으로 EA 스포츠의 FIFA 시리즈 28번째 정규작. (https://ko.wikipedia.org/wiki/FIFA_21)
+- 데이터의 출처 : https://sofifa.com (EA Sports의 비디오 게임 시리즈의 유저 토론 및 통계 플랫폼)
+- 해당 데이터는 FIFA 21에 등장하는 선수들의 포지션, 능력치, 소속 팀등에 대한 정보를 담고 있음.
+- [데이터](https://raw.githubusercontent.com/ChSSolee/R-study/main/EDA%20%26%20Vis/fifa21_male2.csv)
+
+<br/>
+
+### 필요 라이브러리 및 데이터 로딩
 ```R
 library(tidyverse)
 library(ggtextures)
@@ -15,11 +28,11 @@ ggplot2::theme_set(theme_ridges())
 fifa <- read.csv("C:/fifa21_male2.csv", stringsAsFactors = TRUE)
 ```
 
+<br/>
 
+### 데이터 확인
 ```R
 head(fifa)
-dim(fifa)
-str(fifa)
 ```
 
 
@@ -47,6 +60,17 @@ str(fifa)
 .list-inline>li {display: inline-block}
 .list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
 </style>
+
+<br/>
+<br/>
+
+
+### 데이터는 17125명의 선수들에 대해 각각 107개의 특성을 가짐
+
+```R
+dim(fifa)
+str(fifa)
+```
 <ol class=list-inline><li>17125</li><li>107</li></ol>
 
 
@@ -154,7 +178,11 @@ str(fifa)
       [list output truncated]
     
 
-### 결측값 제거
+
+<br/>
+
+### 결측값 확인 및 제거
+- 843개의 결측값에 대해 DMwR패키지의 ```centralImputation()```를 통하여, 수치형 변수는 해당 변수의 중위수, 요인형 변수는 경우는 최빈값으로 대체
 
 
 ```R
@@ -178,8 +206,11 @@ sum(is.na(fifa))
 
 0
 
+<br/>
 
-### Player Counts of Country
+<br/>
+
+### FIFA21의 데이터 중 가장 많은 선수 국적은?
 
 
 ```R

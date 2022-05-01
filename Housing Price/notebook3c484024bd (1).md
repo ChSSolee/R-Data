@@ -492,11 +492,21 @@ ggplot() + geom_point(aes(train_rec$SalePrice, exp(glm_pred))) +
 
 ### 회귀 스플라인 (MARS)
 
+#### Multivariate adaptive regression splines (MARS)
+- MARS는 단계 함수와 유사한 컷 포인트(knot)를 평가하여 데이터의 비선형 관계를 캡쳐
+- 각 예측변수에 대해 knot별로 선형회귀 모델을 생성하고 추정
+- 많은 매듭을 포함하면 좋은 관계를 맞출 수 있지만, 새로운 데이터에는 일반화 되지 않음
+- 매듭의 전체 집합중, 예측 정확도에 크게 기여하지 않는 매듭을 순차적으로 제거(가지치기)
+- 교차검증을 사용하여 최적의 매듭 수 탐색
 
 ```R
 library(earth)
 ```
 
+#### 그리드 서치
+- 조정 매개변수 
+1. 상호작용 차수(degree)
+2. 최종 모델에 유지되는 항의 수
 
 ```R
 hyper_grid <- expand.grid(
@@ -526,7 +536,6 @@ tail(hyper_grid)
 
 
 
-
 ```R
 set.seed(123)
 cv_mars <- train(
@@ -538,6 +547,7 @@ cv_mars <- train(
 )
 ```
 
+- 최적의 모형 (차수 = 1, 구간 수 = 34)
 
 ```R
 cv_mars$results %>%
